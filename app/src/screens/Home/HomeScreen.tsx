@@ -5,6 +5,7 @@ import { LinearGradient } from 'expo-linear-gradient';
 import Header from '../../components/Header';
 import BottomNav from '../../components/BottomNav';
 import MovieDetailModal from "../../modals/MovieDetailModal";
+import PalestineBanner from "../../palestinaBanner/PalestineBanner";
 
 const { width } = Dimensions.get('window');
 
@@ -26,6 +27,10 @@ const HomeScreen = () => {
 
     return (
         <SafeAreaView style={styles.container}>
+            <PalestineBanner
+                statement="We stand in solidarity with the people of palestine."
+                externalLink="https://blog.paulbiggar.com/i-cant-sleep/"
+            />
             <ScrollView style={styles.scrollContent}>
                 <Header />
 

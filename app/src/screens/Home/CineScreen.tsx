@@ -1,19 +1,27 @@
 import React from 'react';
-import { StyleSheet, Text, SafeAreaView, ScrollView, ImageBackground } from 'react-native';
+import {StyleSheet, Text, SafeAreaView, ScrollView, ImageBackground, TouchableOpacity} from 'react-native';
 import Header from '../../components/Header';
 import Section from '../../components/Section';
 import BottomNav from '../../components/BottomNav';
+import {NavigationProp, useNavigation} from "@react-navigation/native";
 
 const CineScreen = () => {
+    const navigation = useNavigation<NavigationProp<any>>();
+
     return (
         <SafeAreaView style={styles.container}>
             <ScrollView>
                 <ImageBackground source={require('../../assets/images/CineBG.png')}>
                     <Header />
+                    <TouchableOpacity
+                        style={styles.backButton}
+                        onPress={() => navigation.navigate('Inside')}
+                    >
+                        <Text style={styles.backButtonText}>← Ir a Cartelera</Text>
+                    </TouchableOpacity>
                     <Text style={styles.mainHeading}>
                         El cine Doré es la sede de proyecciones de Filmoteca Española.
                     </Text>
-
                     <Section title="Horario taquilla">
                         <Text style={styles.note}>*Excepto festivos</Text>
                         <Text style={styles.sectionText}>• Invierno de 17:00 a 20:00</Text>
@@ -48,10 +56,19 @@ const styles = StyleSheet.create({
     },
     mainHeading: {
         color: '#ffffff',
-        fontSize: 24,
+        fontSize: 20,
         textAlign: 'center',
         padding: 20,
         marginVertical: 20,
+    },
+    backButton: {
+        top: 10,
+        left: 16,
+        zIndex: 1,
+    },
+    backButtonText: {
+        color: '#fff',
+        fontSize: 15,
     },
     note: {
         color: '#ffffff',

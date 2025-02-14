@@ -4,8 +4,10 @@ import { LinearGradient } from 'expo-linear-gradient';
 import { FIREBASE_AUTH } from '../../../../FirebaseConfig';
 import Header from '../../components/Header';
 import BottomNav from '../../components/BottomNav';
+import {NavigationProp, useNavigation} from "@react-navigation/native";
 
 const ProfileScreen = () => {
+    const navigation = useNavigation<NavigationProp<any>>();
     const handleSignOut = async () => {
         try {
             await FIREBASE_AUTH.signOut();
@@ -18,7 +20,13 @@ const ProfileScreen = () => {
         <SafeAreaView style={styles.container}>
             <ScrollView style={styles.scrollContent}>
                 <ImageBackground source={require('../../assets/images/ProfileBG.png')} style={styles.ProfileBG}>
-                    <Header />
+                    <Header/>
+                    <TouchableOpacity
+                        style={styles.backButton}
+                        onPress={() => navigation.navigate('Inside')}
+                    >
+                        <Text style={styles.backButtonText}>← Ir a Cartelera</Text>
+                    </TouchableOpacity>
                     <View style={styles.welcomeContainer}>
                         <Text style={styles.welcomeText}>¡Hola!</Text>
                         <Text style={styles.nameText}>Bienvenido, Yahya Sinwar</Text>
@@ -58,6 +66,15 @@ const styles = StyleSheet.create({
     },
     ProfileBG: {
         height: '110%',
+    },
+    backButton: {
+        top: 10,
+        left: 16,
+        zIndex: 1,
+    },
+    backButtonText: {
+        color: '#fff',
+        fontSize: 15,
     },
     welcomeContainer: {
         padding: 20,
