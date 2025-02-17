@@ -1,39 +1,69 @@
-import React from 'react';
+import React, {useEffect, useState} from 'react';
 import { StyleSheet, View, Text, SafeAreaView, ScrollView, TouchableOpacity, ImageBackground } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
-import { FIREBASE_AUTH } from '../../../../FirebaseConfig';
-import Header from '../../components/Header';
-import BottomNav from '../../components/BottomNav';
-import {NavigationProp, useNavigation} from "@react-navigation/native";
+import { NavigationProp, useNavigation } from "@react-navigation/native";
+import {getUserProfile, logout} from "../../services/api";
+import * as SecureStore from 'expo-secure-store';
+import BottomNav from "../../components/BottomNav";
+import Header from "../../components/Header";
+import {useAuth} from "../../hooks/useAuth";
+import { DangerButton } from '../../components/buttons/DangerButton';
+import {ConfirmationModal} from "../../modals/ConfirmationModal";
 
-const ProfileScreen = () => {
+interface ProfileProps {
+    setUser: (value: boolean) => void;
+}
+
+const Profile: React.FC<ProfileProps> = ({ setUser }) => {
     const navigation = useNavigation<NavigationProp<any>>();
-    const handleSignOut = async () => {
-        try {
-            await FIREBASE_AUTH.signOut();
-        } catch (error) {
-            console.error('Error signing out:', error);
-        }
+    const { handleDeleteAccount } = useAuth(setUser);
+    const [showDeleteConfirmation, setShowDeleteConfirmation] = useState(false);
+    const [userProfile, setUserProfile] = useState<{
+        nombre: string;
+        apellidos: string;
+        correoElectronico: string;
+        telefono?: string;
+    } | null>(null);
+
+    useEffect(() => {
+        const fetchUserProfile = async () => {
+            try {
+                const profileData = await getUserProfile();
+                setUserProfile(profileData);
+            } catch (error) {
+                console.error('Error fetching user profile:', error);
+            }
+        };
+
+        fetchUserProfile();
+    }, []);
+
+    const handleLogout = async () => {
+        await logout(); // Call the logout function
+        await SecureStore.deleteItemAsync('token'); // Remove the token from SecureStore
+        setUser(false); // Update the user state to false
     };
 
     return (
         <SafeAreaView style={styles.container}>
             <ScrollView style={styles.scrollContent}>
                 <ImageBackground source={require('../../assets/images/ProfileBG.png')} style={styles.ProfileBG}>
-                    <Header/>
+                    <Header />
                     <TouchableOpacity
                         style={styles.backButton}
-                        onPress={() => navigation.navigate('Inside')}
+                        onPress={() => navigation.navigate('Home')}
                     >
                         <Text style={styles.backButtonText}>← Ir a Cartelera</Text>
                     </TouchableOpacity>
                     <View style={styles.welcomeContainer}>
                         <Text style={styles.welcomeText}>¡Hola!</Text>
-                        <Text style={styles.nameText}>Bienvenido, Yahya Sinwar</Text>
+                        <Text style={styles.nameText}>
+                            Bienvenido, {userProfile ? `${userProfile.nombre} ${userProfile.apellidos}` : 'Usuario'}
+                        </Text>
                     </View>
 
                     <View style={styles.buttonContainer}>
-                        <TouchableOpacity onPress={handleSignOut}>
+                        <TouchableOpacity onPress={handleLogout}>
                             <LinearGradient
                                 colors={['#5CE1FF', '#4B6DEE']}
                                 start={{ x: 0, y: 0 }}
@@ -43,14 +73,22 @@ const ProfileScreen = () => {
                                 <Text style={styles.buttonText}>Cerrar sesión</Text>
                             </LinearGradient>
                         </TouchableOpacity>
-
-                        <TouchableOpacity style={styles.deleteAccountButton}>
-                            <Text style={styles.deleteAccountText}>Eliminar cuenta</Text>
-                        </TouchableOpacity>
+                        <DangerButton
+                            text="Eliminar cuenta"
+                            onPress={() => setShowDeleteConfirmation(true)}
+                        />
                     </View>
                 </ImageBackground>
             </ScrollView>
-
+            <ConfirmationModal
+                isVisible={showDeleteConfirmation}
+                onClose={() => setShowDeleteConfirmation(false)}
+                onConfirm={handleDeleteAccount}
+                title="Confirmar eliminación"
+                message="¿Está seguro que desea eliminar su cuenta? Esta acción no se puede deshacer."
+                confirmText="Eliminar"
+                cancelText="Cancelar"
+            />
             <BottomNav />
         </SafeAreaView>
     );
@@ -117,4 +155,4 @@ const styles = StyleSheet.create({
     },
 });
 
-export default ProfileScreen;
+export default Profile;

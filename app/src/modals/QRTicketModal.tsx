@@ -1,58 +1,81 @@
-import React from 'react';
-import { Modal, View, Text, StyleSheet } from 'react-native';
+import React, { useEffect } from 'react';
+import { Modal, View, Text, StyleSheet, TouchableOpacity } from 'react-native';
 import QRCode from 'react-native-qrcode-svg';
-import Svg, { Path } from 'react-native-svg';
+import { X } from 'lucide-react-native';
 
-const TicketNotch = () => (
-    <View style={styles.notchContainer}>
-        <Svg height="30" width="72" style={styles.notch}>
-            <Path
-                d="M0 0 H72 V15 C36 15 36 30 0 30 Z"
-                fill="rgba(0, 0, 0, 0.5)"
-            />
-        </Svg>
-    </View>
-);
+const QRTicketModal = ({ visible, onClose }) => {
+    useEffect(() => {
+        if (visible) {
+            const timer = setTimeout(() => {
+                onClose();
+            }, 20000); // 20 seconds
 
-const QRTicketModal = ({ visible, onClose, movie, selectedDate, selectedTime }) => (
-    <Modal
-        animationType="slide"
-        transparent={true}
-        visible={visible}
-        onRequestClose={onClose}
-    >
-        <View style={styles.modalContainer}>
-            <View style={styles.ticketContainer}>
-                <TicketNotch />
-                <View style={styles.ticketContent}>
-                    <View style={styles.ticketHeader}>
-                        <Text style={styles.movieTitle}>La Dolce Vita</Text>
-                        <Text style={styles.movieRating}>18</Text>
-                    </View>
+            return () => clearTimeout(timer);
+        }
+    }, [visible, onClose]);
 
-                    <View style={styles.qrCodeContainer}>
+    return (
+        <Modal
+            animationType="slide"
+            transparent={true}
+            visible={visible}
+            onRequestClose={onClose}
+        >
+            <View style={styles.modalContainer}>
+                <View style={styles.ticketContainer}>
+                    {/* Close Button */}
+                    <TouchableOpacity
+                        style={styles.closeButton}
+                        onPress={onClose}
+                    >
+                        <X size={24} color="#000" />
+                    </TouchableOpacity>
+
+                    {/* QR Code Section */}
+                    <View style={styles.qrSection}>
                         <QRCode
-                            value={`Movie: ${movie?.title}, Date: ${selectedDate}, Time: ${selectedTime}, Sala: 1`}
+                            value="x3 Entradas"
                             size={200}
+                            backgroundColor="white"
                         />
+                        <Text style={styles.entriesText}>x3 Entradas</Text>
                     </View>
 
-                    <View style={styles.ticketDetails}>
-                        <View style={styles.detailRow}>
-                            <Text style={styles.detailText}>Miércoles 15 de Enero</Text>
-                            <Text style={styles.detailText}>1h 14m</Text>
+                    {/* Divider with circles */}
+                    <View style={styles.divider}>
+                        <View style={styles.leftCircle} />
+                        <View style={styles.dottedLine} />
+                        <View style={styles.rightCircle} />
+                    </View>
+
+                    {/* Movie Details Section */}
+                    <View style={styles.detailsSection}>
+                        <View style={styles.headerRow}>
+                            <View style={styles.ratingContainer}>
+                                <Text style={styles.ratingText}>18</Text>
+                            </View>
+                            <Text style={styles.movieTitle}>La Dolce Vita</Text>
+                            <View style={styles.durationContainer}>
+                                <Text style={styles.durationText}>1h 14m</Text>
+                            </View>
+                            <View style={styles.voseContainer}>
+                                <Text style={styles.voseText}>VOSE</Text>
+                            </View>
                         </View>
-                        <View style={styles.detailRow}>
-                            <Text style={styles.detailText}>17:00</Text>
-                            <Text style={styles.detailText}>Sala: 1</Text>
+
+                        <View style={styles.showingDetails}>
+                            <View style={styles.dateTimeRow}>
+                                <Text style={styles.dateText}>Miércoles 15 de Enero</Text>
+                                <Text style={styles.timeText}>17:00</Text>
+                                <Text style={styles.roomText}>Sala: 1</Text>
+                            </View>
                         </View>
-                        <Text style={styles.voseText}>VOSE</Text>
                     </View>
                 </View>
             </View>
-        </View>
-    </Modal>
-);
+        </Modal>
+    );
+};
 
 const styles = StyleSheet.create({
     modalContainer: {
@@ -60,69 +83,125 @@ const styles = StyleSheet.create({
         justifyContent: 'center',
         alignItems: 'center',
         backgroundColor: 'rgba(0, 0, 0, 0.5)',
+        padding: 20,
     },
     ticketContainer: {
-        width: '90%',
+        width: '100%',
+        maxWidth: 350,
         backgroundColor: 'white',
-        borderRadius: 10,
+        borderRadius: 20,
         overflow: 'hidden',
+        position: 'relative', // For absolute positioning of close button
     },
-    notchContainer: {
-        height: 80,
-        backgroundColor: 'white',
-        borderTopLeftRadius: 10,
-        borderTopRightRadius: 10,
-        overflow: 'hidden',
-        alignItems: 'center',
-    },
-    notch: {
+    closeButton: {
         position: 'absolute',
-        top: -15,
+        top: 10,
+        right: 10,
+        zIndex: 1,
+        backgroundColor: 'rgba(255, 255, 255, 0.9)',
+        borderRadius: 20,
+        padding: 8,
     },
-    ticketContent: {
-        backgroundColor: 'white',
-        borderBottomLeftRadius: 10,
-        borderBottomRightRadius: 10,
-    },
-    ticketHeader: {
-        flexDirection: 'row',
-        justifyContent: 'space-between',
+    qrSection: {
+        marginTop:40,
+        padding: 20,
         alignItems: 'center',
+        backgroundColor: 'white',
+    },
+    entriesText: {
+        marginTop: 10,
+        fontSize: 16,
+        fontWeight: '500',
+    },
+    divider: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        paddingHorizontal: 0,
+    },
+    leftCircle: {
+        width: 20,
+        height: 20,
+        borderRadius: 10,
+        backgroundColor: 'rgba(0, 0, 0, 0.5)',
+        marginLeft: -10,
+    },
+    rightCircle: {
+        width: 20,
+        height: 20,
+        borderRadius: 10,
+        backgroundColor: 'rgba(0, 0, 0, 0.5)',
+        marginRight: -10,
+    },
+    dottedLine: {
+        flex: 1,
+        height: 1,
+        borderStyle: 'dashed',
+        borderWidth: 1,
+        borderColor: '#CCCCCC',
+        marginHorizontal: 10,
+    },
+    detailsSection: {
         padding: 15,
+        backgroundColor: 'white',
+        marginBottom: 40,
+    },
+    headerRow: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        marginBottom: 15,
+        gap: 8,
+    },
+    ratingContainer: {
+        borderWidth: 1,
+        borderColor: '#000',
+        borderRadius: 4,
+        padding: 2,
+        minWidth: 28,
+        alignItems: 'center',
+    },
+    ratingText: {
+        fontSize: 14,
+        fontWeight: '500',
     },
     movieTitle: {
-        fontSize: 18,
-        fontWeight: 'bold',
-    },
-    movieRating: {
         fontSize: 16,
-        borderWidth: 1,
-        borderColor: 'black',
-        paddingHorizontal: 8,
-        paddingVertical: 4,
-        borderRadius: 4,
+        fontWeight: 'bold',
+        flex: 1,
     },
-    qrCodeContainer: {
-        alignItems: 'center',
-        padding: 20,
-        borderBottomWidth: 1,
-        borderBottomColor: '#e0e0e0',
+    durationContainer: {
+        alignItems: 'flex-end',
     },
-    ticketDetails: {
-        padding: 15,
-    },
-    detailRow: {
-        flexDirection: 'row',
-        justifyContent: 'space-between',
-        marginBottom: 10,
-    },
-    detailText: {
+    durationText: {
         fontSize: 14,
         color: '#666',
     },
+    voseContainer: {
+        backgroundColor: '#f0f0f0',
+        padding: 4,
+        borderRadius: 4,
+    },
     voseText: {
-        textAlign: 'right',
         fontSize: 12,
+        fontWeight: '500',
+    },
+    showingDetails: {
+        marginTop: 5,
+    },
+    dateTimeRow: {
+        flexDirection: 'row',
+        justifyContent: 'space-between',
+        alignItems: 'center',
+    },
+    dateText: {
+        fontSize: 14,
+        color: '#666',
+    },
+    timeText: {
+        fontSize: 14,
+        color: '#666',
+    },
+    roomText: {
+        fontSize: 14,
         color: '#666',
     },
 });

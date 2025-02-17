@@ -5,7 +5,7 @@ import Section from '../../components/Section';
 import BottomNav from '../../components/BottomNav';
 import {NavigationProp, useNavigation} from "@react-navigation/native";
 
-const CineScreen = () => {
+const Cine = () => {
     const navigation = useNavigation<NavigationProp<any>>();
 
     return (
@@ -15,7 +15,7 @@ const CineScreen = () => {
                     <Header />
                     <TouchableOpacity
                         style={styles.backButton}
-                        onPress={() => navigation.navigate('Inside')}
+                        onPress={() => navigation.navigate('Home')}
                     >
                         <Text style={styles.backButtonText}>← Ir a Cartelera</Text>
                     </TouchableOpacity>
@@ -83,4 +83,4 @@ const styles = StyleSheet.create({
     },
 });
 
-export default CineScreen;
+export default Cine;

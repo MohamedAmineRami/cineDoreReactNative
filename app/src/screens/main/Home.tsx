@@ -1,6 +1,5 @@
 import React, { useState } from 'react';
 import { View, Text, Image, ScrollView, TouchableOpacity, StyleSheet, SafeAreaView, Dimensions } from 'react-native';
-//import MovieDetailModal from './MovieDetailModal';
 import { LinearGradient } from 'expo-linear-gradient';
 import Header from '../../components/Header';
 import BottomNav from '../../components/BottomNav';
@@ -9,7 +8,7 @@ import PalestineBanner from "../../palestinaBanner/PalestineBanner";
 
 const { width } = Dimensions.get('window');
 
-const HomeScreen = () => {
+const Home = () => {
     const [selectedMovie, setSelectedMovie] = useState(null);
     const [modalVisible, setModalVisible] = useState(false);
 
@@ -71,7 +70,7 @@ const HomeScreen = () => {
                 </View>
             </ScrollView>
 
-            <BottomNav />
+            <BottomNav/>
             <MovieDetailModal
                 visible={modalVisible}
                 movie={selectedMovie}
@@ -152,4 +151,4 @@ const styles = StyleSheet.create({
     },
 });
 
-export default HomeScreen;
+export default Home;

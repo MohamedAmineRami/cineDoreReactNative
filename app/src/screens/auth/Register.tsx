@@ -1,11 +1,12 @@
+// src/screens/Register.tsx
 import React, { useState } from 'react';
-import { Text, TouchableOpacity, StyleSheet, KeyboardAvoidingView, ScrollView, ImageBackground } from 'react-native';
+import { Alert, KeyboardAvoidingView, ScrollView, StyleSheet, Text, TouchableOpacity } from 'react-native';
+import {NavigationProp, useNavigation} from '@react-navigation/native';
+import { ImageBackground } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
-import { useNavigation } from '@react-navigation/native';
-import { FIREBASE_AUTH } from "../../../../FirebaseConfig";
-import { createUserWithEmailAndPassword } from 'firebase/auth';
 import Input from '../../components/Input';
-import Button from '../../components/Button';
+import Button from '../../components/buttons/Button';
+import { register } from '../../services/api';
 
 const Register = () => {
     const [email, setEmail] = useState('');
@@ -16,25 +17,33 @@ const Register = () => {
     const [birthDate, setBirthDate] = useState('');
     const [phone, setPhone] = useState('');
     const [document, setDocument] = useState('');
-    const navigation = useNavigation();
-    const auth = FIREBASE_AUTH;
+    const navigation = useNavigation<NavigationProp<any>>();
 
     const handleRegister = async () => {
         if (email !== confirmEmail) {
-            alert('Los correos electrónicos no coinciden');
+            Alert.alert('Error', 'Los correos electrónicos no coinciden');
             return;
         }
         if (password.length < 10) {
-            alert('La contraseña debe tener al menos 10 caracteres');
+            Alert.alert('Error', 'La contraseña debe tener al menos 10 caracteres');
             return;
         }
 
         try {
-            const response = await createUserWithEmailAndPassword(auth, email, password);
-            console.log(response);
+            const userData = {
+                nombre: firstName,
+                apellidos: lastName,
+                correoElectronico: email,
+                contrasenia: password,
+                telefono: phone,
+                identificacion: document,
+                fechaNacimiento: birthDate,
+            };
+            await register(userData);
+            Alert.alert('Éxito', 'Usuario registrado correctamente');
+            navigation.navigate('Login');
         } catch (error) {
-            console.log(error);
-            alert('Error al registrar: ' + error.message);
+            Alert.alert('Error', 'Error al registrar el usuario');
         }
     };
 
@@ -91,7 +100,7 @@ const Register = () => {
                         label="Fecha de nacimiento*"
                         value={birthDate}
                         onChangeText={setBirthDate}
-                        placeholder="DD/MM/YYYY"
+                        placeholder="YYYY/MM/DD"
                     />
 
                     <Input
@@ -106,7 +115,6 @@ const Register = () => {
                         value={document}
                         onChangeText={setDocument}
                     />
-
                     <Button title="Crear cuenta" onPress={handleRegister} />
                 </ScrollView>
             </KeyboardAvoidingView>
@@ -116,15 +124,20 @@ const Register = () => {
 
 const styles = StyleSheet.create({
     container: {
+        width: '100%',
+        height: '100%',
+        justifyContent: 'flex-end',
         flex: 1,
     },
     scrollView: {
         flex: 1,
         padding: 20,
-        marginTop: 50,
     },
     backButton: {
-        marginBottom: 20,
+        position: 'absolute',
+        top: 50,
+        left: 20,
+        zIndex: 1,
     },
     title: {
         fontSize: 24,

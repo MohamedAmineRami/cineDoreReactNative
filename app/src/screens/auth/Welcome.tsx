@@ -1,6 +1,6 @@
 import React from 'react';
 import { View, Text, StyleSheet, ImageBackground, Image } from 'react-native';
-import Button from '../../components/Button';
+import Button from '../../components/buttons/Button';
 
 const Welcome = ({ navigation }) => {
     return (

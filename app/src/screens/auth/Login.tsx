@@ -1,27 +1,31 @@
 import React, { useState } from 'react';
-import { Text, TouchableOpacity, StyleSheet, ActivityIndicator, KeyboardAvoidingView, ImageBackground } from 'react-native';
+import { ActivityIndicator, Alert, KeyboardAvoidingView, StyleSheet, Text, TouchableOpacity } from 'react-native';
+import {NavigationProp, useNavigation} from '@react-navigation/native';
+import { ImageBackground } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
-import { useNavigation } from '@react-navigation/native';
-import { FIREBASE_AUTH } from "../../../../FirebaseConfig";
-import { signInWithEmailAndPassword } from 'firebase/auth';
 import Input from '../../components/Input';
-import Button from '../../components/Button';
+import Button from '../../components/buttons/Button';
+import { login } from '../../services/api';
+import * as SecureStore from 'expo-secure-store';
 
-const Login = () => {
+interface LoginProps {
+    setUser: (value: boolean) => void;
+}
+
+const Login: React.FC<LoginProps> = ({ setUser }) => {
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
     const [loading, setLoading] = useState(false);
-    const navigation = useNavigation();
-    const auth = FIREBASE_AUTH;
+    const navigation = useNavigation<NavigationProp<any>>();
 
-    const SignIn = async () => {
+    const handleLogin = async () => {
         setLoading(true);
         try {
-            const response = await signInWithEmailAndPassword(auth, email, password);
-            console.log(response);
+            const response = await login(email, password);
+            await SecureStore.setItemAsync('token', response.token); // Store JWT token
+            setUser(true); // Update user state
         } catch (error) {
-            console.log(error);
-            alert('Error! ' + error.message);
+            Alert.alert('Error', 'Invalid email or password');
         } finally {
             setLoading(false);
         }
@@ -59,7 +63,7 @@ const Login = () => {
                 {loading ? (
                     <ActivityIndicator size="large" color="#3498db" style={styles.loader} />
                 ) : (
-                    <Button title="Iniciar sesión" onPress={SignIn} />
+                    <Button title="Iniciar sesión" onPress={handleLogin} />
                 )}
             </KeyboardAvoidingView>
         </ImageBackground>
