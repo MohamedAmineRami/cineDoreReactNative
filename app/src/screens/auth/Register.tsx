@@ -6,7 +6,7 @@ import { ImageBackground } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import Input from '../../components/Input';
 import Button from '../../components/buttons/Button';
-import { register } from '../../services/api';
+import { register } from '../../services/auth';
 
 const Register = () => {
     const [email, setEmail] = useState('');

@@ -5,7 +5,7 @@ import { ImageBackground } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import Input from '../../components/Input';
 import Button from '../../components/buttons/Button';
-import { login } from '../../services/api';
+import { login } from '../../services/auth';
 import * as SecureStore from 'expo-secure-store';
 
 interface LoginProps {

@@ -2,7 +2,7 @@ import { useCallback } from 'react';
 import { Alert } from 'react-native';
 import * as SecureStore from 'expo-secure-store';
 import {NavigationProp, useNavigation} from '@react-navigation/native';
-import { deleteAccount } from '../services/api';
+import { deleteAccount } from '../services/auth';
 
 export const useAuth = (setUser: (value: boolean) => void) => {
     const navigation = useNavigation<NavigationProp<any>>();

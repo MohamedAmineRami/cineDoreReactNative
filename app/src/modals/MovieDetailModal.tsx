@@ -1,37 +1,49 @@
-import React, { useState } from 'react';
+// src/components/MovieDetailModal/MovieDetailModal.tsx
+import React, { useState, useEffect } from 'react';
 import { View, Text, Modal, TouchableOpacity, Image, StyleSheet } from 'react-native';
 import TabNavigation from '../components/TabNavigation';
 import TicketPurchaseModal from '../modals/TicketPurchaseModal';
+import { fetchMovieById } from '../services/movies';
+import { Movie } from '../types';
 
-const MovieDetailModal = ({ visible, movie, onClose }) => {
+interface MovieDetailModalProps {
+    visible: boolean;
+    movieId: number | null; // Pass movieId instead of the entire movie object
+    onClose: () => void;
+}
+
+const MovieDetailModal: React.FC<MovieDetailModalProps> = ({ visible, movieId, onClose }) => {
     const [activeTab, setActiveTab] = useState('Horarios');
     const [showTicketPurchase, setShowTicketPurchase] = useState(false);
     const [selectedDate, setSelectedDate] = useState('');
     const [selectedTime, setSelectedTime] = useState('');
+    const [movie, setMovie] = useState<Movie | null>(null); // State to store movie details
 
-    const movieDetails = {
-        'La Dolce Vita': {
-            year: '1960',
-            duration: '1h 14m',
-            format: '(DCP) Proyeccion en Formato Digital',
-            formatDetails: '175\' B/N',
-            schedules: {
-                'Hoy, Miércoles 15 de Enero': '17:00',
-                'Jueves 16 de Enero': '18:00',
-            },
-            synopsis: 'La historia sigue a Marcello Rubini...',
-        },
-        // other movies ...
-    };
+    // Fetch movie details when movieId changes
+    useEffect(() => {
+        if (movieId) {
+            const loadMovieDetails = async () => {
+                try {
+                    const data = await fetchMovieById(movieId);
+                    setMovie(data);
+                } catch (error) {
+                    console.error('Failed to load movie details:', error);
+                }
+            };
+            loadMovieDetails();
+        }
+    }, [movieId]);
 
     if (!movie) return null;
 
-    const details = movieDetails[movie.title] || {
-        schedules: {},
-        synopsis: 'Información no disponible',
-        format: '',
-        formatDetails: '',
-    };
+    // Format the movie's functions into schedules
+    const schedules = movie.funciones.reduce((acc, funcion) => {
+        const date = new Date(funcion.fechaHora).toLocaleDateString();
+        const time = new Date(funcion.fechaHora).toLocaleTimeString();
+        if (!acc[date]) acc[date] = [];
+        acc[date].push(time);
+        return acc;
+    }, {} as { [key: string]: string[] });
 
     return (
         <>
@@ -48,7 +60,7 @@ const MovieDetailModal = ({ visible, movie, onClose }) => {
                             <Text style={styles.backButtonText}>← Atrás</Text>
                         </TouchableOpacity>
 
-                        <Image source={movie.image} style={styles.modalImage} />
+                        <Image source={{ uri: movie.imagenPoster }} style={styles.modalImage} />
 
                         <TabNavigation
                             tabs={['Horarios', 'Sinopsis']}
@@ -59,35 +71,37 @@ const MovieDetailModal = ({ visible, movie, onClose }) => {
                         <View style={styles.detailsContainer}>
                             <View style={styles.titleContainer}>
                                 <Text style={styles.age}>18</Text>
-                                <Text style={styles.title}>{movie.title}</Text>
-                                <Text style={styles.duration}>Drama | {details.year} {details.duration} VOSE</Text>
+                                <Text style={styles.title}>{movie.nombre}</Text>
+                                <Text style={styles.duration}>Drama | {movie.anio} {movie.duracion}m VOSE</Text>
                             </View>
 
                             {activeTab === 'Horarios' ? (
                                 <View style={styles.scheduleContainer}>
-                                    {Object.entries(details.schedules).map(([date, time]) => (
+                                    {Object.entries(schedules).map(([date, times]) => (
                                         <TouchableOpacity
                                             key={date}
                                             style={styles.scheduleItem}
                                             onPress={() => {
                                                 setSelectedDate(date);
-                                                setSelectedTime(time);
+                                                setSelectedTime(times[0]);
                                                 setShowTicketPurchase(true);
                                             }}
                                         >
                                             <Text style={styles.scheduleDate}>{date}</Text>
-                                            <Text style={styles.scheduleTime}>{time}</Text>
+                                            {times.map((time, index) => (
+                                                <Text key={index} style={styles.scheduleTime}>{time}</Text>
+                                            ))}
                                         </TouchableOpacity>
                                     ))}
                                 </View>
                             ) : (
                                 <View style={styles.synopsisContainer}>
                                     <Text style={styles.sectionTitle}>Formato:</Text>
-                                    <Text style={styles.format}>{details.format}</Text>
-                                    <Text style={styles.formatDetails}>{details.formatDetails}</Text>
+                                    <Text style={styles.format}>{movie.formato}</Text>
+                                    <Text style={styles.formatDetails}>{movie.color}</Text>
 
                                     <Text style={styles.sectionTitle}>Información de la película</Text>
-                                    <Text style={styles.synopsis}>{details.synopsis}</Text>
+                                    <Text style={styles.synopsis}>{movie.sinopsis}</Text>
                                 </View>
                             )}
                         </View>

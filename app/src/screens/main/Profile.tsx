@@ -2,7 +2,7 @@ import React, {useEffect, useState} from 'react';
 import { StyleSheet, View, Text, SafeAreaView, ScrollView, TouchableOpacity, ImageBackground } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
 import { NavigationProp, useNavigation } from "@react-navigation/native";
-import {getUserProfile, logout} from "../../services/api";
+import {getUserProfile, logout} from "../../services/auth";
 import * as SecureStore from 'expo-secure-store';
 import BottomNav from "../../components/BottomNav";
 import Header from "../../components/Header";
