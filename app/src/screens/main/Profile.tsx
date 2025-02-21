@@ -4,10 +4,10 @@ import { LinearGradient } from 'expo-linear-gradient';
 import { NavigationProp, useNavigation } from "@react-navigation/native";
 import {getUserProfile, logout} from "../../services/auth";
 import * as SecureStore from 'expo-secure-store';
-import BottomNav from "../../components/BottomNav";
-import Header from "../../components/Header";
+import BottomNav from "../../components/common/BottomNav";
+import Header from "../../components/common/Header";
 import {useAuth} from "../../hooks/useAuth";
-import { DangerButton } from '../../components/buttons/DangerButton';
+import { DangerButton } from '../../components/common/buttons/DangerButton';
 import {ConfirmationModal} from "../../modals/ConfirmationModal";
 
 interface ProfileProps {

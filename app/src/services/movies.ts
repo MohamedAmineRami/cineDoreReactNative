@@ -1,5 +1,5 @@
 import api from './api';
-import {Movie} from "../types";
+import {Funcion, Movie} from "../types";
 
 export const fetchMovies = async () => {
     try {
@@ -17,6 +17,16 @@ export const fetchMovieById = async (id: number): Promise<Movie> => {
         return response.data;
     } catch (error) {
         console.error('Error fetching movie details:', error);
+        throw error;
+    }
+};
+
+export const fetchFuncionesByMovieId = async (movieId: number): Promise<Funcion[]> => {
+    try {
+        const response = await api.get(`/funciones?peliculaId=${movieId}`);
+        return response.data;
+    } catch (error) {
+        console.error('Error fetching funciones:', error);
         throw error;
     }
 };

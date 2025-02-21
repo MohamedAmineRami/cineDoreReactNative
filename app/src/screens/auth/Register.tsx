@@ -4,8 +4,8 @@ import { Alert, KeyboardAvoidingView, ScrollView, StyleSheet, Text, TouchableOpa
 import {NavigationProp, useNavigation} from '@react-navigation/native';
 import { ImageBackground } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
-import Input from '../../components/Input';
-import Button from '../../components/buttons/Button';
+import Input from '../../components/common/Input';
+import Button from '../../components/common/buttons/Button';
 import { register } from '../../services/auth';
 
 const Register = () => {

@@ -1,14 +1,13 @@
 import React, { useEffect, useState } from 'react';
 import { SafeAreaView, ScrollView, StyleSheet } from 'react-native';
 import PalestineBanner from '../../palestinaBanner/PalestineBanner';
-import Header from '../../components/Header';
-import BottomNav from '../../components/BottomNav';
+import Header from '../../components/common/Header';
+import BottomNav from '../../components/common/BottomNav';
 import FeaturedSection from '../../components/movie/FeaturedSection';
 import MovieGrid from '../../components/movie/MovieGrid';
-import MovieDetailModal from '../../modals/MovieDetailModal';
+import MovieDetailModal from '../../components/movieTicket/MovieDetailModal';
 import { fetchMovies } from '../../services/movies';
 import { Movie } from '../../types';
-import CountryFlag from "react-native-country-flag";
 
 const Home = () => {
     const [selectedMovieId, setSelectedMovieId] = useState<number | null>(null);

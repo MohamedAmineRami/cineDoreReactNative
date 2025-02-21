@@ -10,7 +10,7 @@ const Header = () => {
             <View style={styles.header}>
                 <View style={styles.logoContainer}>
                     <Image
-                        source={require('../assets/images/logoCinedore.png')}
+                        source={require('../../assets/images/logoCinedore.png')}
                         style={styles.logo}
                         resizeMode="contain"
                     />
@@ -20,12 +20,12 @@ const Header = () => {
                 </View>
                 <View style={styles.rightLogosContainer}>
                     <Image
-                        source={require('../assets/images/ministerio.png')}
+                        source={require('../../assets/images/ministerio.png')}
                         style={styles.rightLogo}
                         resizeMode="contain"
                     />
                     <Image
-                        source={require('../assets/images/filmotecaLogoText.png')}
+                        source={require('../../assets/images/filmotecaLogoText.png')}
                         style={styles.rightLogo}
                         resizeMode="contain"
                     />

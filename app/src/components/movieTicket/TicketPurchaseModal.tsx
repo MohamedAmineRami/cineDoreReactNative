@@ -1,9 +1,17 @@
 import React, { useState } from 'react';
 import { Modal, View, Text, TouchableOpacity, Image, StyleSheet, ScrollView, SafeAreaView } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
-import QuantityControl from '../components/QuantityControl';
+import { Movie, Funcion } from '../../types';
+import TicketType from '../../components/movieTicket/TicketType';
 
-const TicketPurchaseModal = ({ visible, onClose, movie, selectedDate, selectedTime }) => {
+interface TicketPurchaseModalProps {
+    visible: boolean;
+    onClose: () => void;
+    movie: Movie;
+    funcion: Funcion | null;
+}
+
+const TicketPurchaseModal = ({ visible, onClose, movie, funcion }) => {
     const [quantities, setQuantities] = useState({
         general: 0,
         reduced: 0,
@@ -19,6 +27,11 @@ const TicketPurchaseModal = ({ visible, onClose, movie, selectedDate, selectedTi
 
     const total = (quantities.general * 3 + quantities.reduced * 2).toFixed(2);
 
+    if (!funcion) return null;
+
+    const date = new Date(funcion.fechaHora).toLocaleDateString();
+    const time = new Date(funcion.fechaHora).toLocaleTimeString();
+
     return (
         <Modal
             animationType="slide"
@@ -32,55 +45,54 @@ const TicketPurchaseModal = ({ visible, onClose, movie, selectedDate, selectedTi
                 </TouchableOpacity>
 
                 <ScrollView style={styles.purchaseContent}>
-                    <Image source={movie?.image} style={styles.movieBanner} />
+                    <Image source={{ uri: movie.imagenPoster }} style={styles.movieBanner} />
 
                     <View style={styles.movieInfo}>
                         <View style={styles.ageRating}>
                             <Text style={styles.ageText}>18</Text>
                         </View>
-                        <Text style={styles.movieTitle}>{movie?.title}</Text>
+                        <Text style={styles.movieTitle}>{movie.nombre}</Text>
                         <Text style={styles.movieTime}>
-                            {selectedDate} - {selectedTime} - Sala: 1
+                            {date} - {time} - Sala: {funcion.sala.nombre}
                         </Text>
                     </View>
 
                     <View style={styles.ticketSection}>
-                        <View style={styles.ticketType}>
-                            <Text style={styles.ticketTitle}>Entrada general</Text>
-                            <Text style={styles.price}>3 €</Text>
-                            <QuantityControl
-                                quantity={quantities.general}
-                                onIncrease={() => updateQuantity('general', 1)}
-                                onDecrease={() => updateQuantity('general', -1)}
-                            />
-                        </View>
+                        <TicketType
+                            title="Entrada general"
+                            price="3 €"
+                            subtitles={[]}
+                            quantity={quantities.general}
+                            onIncrease={() => updateQuantity('general', 1)}
+                            onDecrease={() => updateQuantity('general', -1)}
+                        />
 
-                        <View style={styles.ticketType}>
-                            <Text style={styles.ticketTitle}>Entrada reducida</Text>
-                            <Text style={styles.price}>2 €</Text>
-                            <Text style={styles.subtitle}>Estudiantes</Text>
-                            <Text style={styles.subtitle}>Familias numerosas</Text>
-                            <Text style={styles.subtitle}>Grupos vinculados a instituciones culturales o educativas</Text>
-                            <Text style={styles.subtitle}>Mayores a 65 años</Text>
-                            <Text style={styles.subtitle}>En situación de desempleo</Text>
-                            <QuantityControl
-                                quantity={quantities.reduced}
-                                onIncrease={() => updateQuantity('reduced', 1)}
-                                onDecrease={() => updateQuantity('reduced', -1)}
-                            />
-                        </View>
+                        <TicketType
+                            title="Entrada reducida"
+                            price="2 €"
+                            subtitles={[
+                                'Estudiantes',
+                                'Familias numerosas',
+                                'Grupos vinculados a instituciones culturales o educativas',
+                                'Mayores a 65 años',
+                                'En situación de desempleo',
+                            ]}
+                            quantity={quantities.reduced}
+                            onIncrease={() => updateQuantity('reduced', 1)}
+                            onDecrease={() => updateQuantity('reduced', -1)}
+                        />
 
-                        <View style={styles.ticketType}>
-                            <Text style={styles.ticketTitle}>Entrada gratuita</Text>
-                            <Text style={styles.price}>0 €</Text>
-                            <Text style={styles.subtitle}>Menor de 18 años</Text>
-                            <Text style={styles.subtitle}>Con discapacidad {'>'}= 33% + Acompañante</Text>
-                            <QuantityControl
-                                quantity={quantities.free}
-                                onIncrease={() => updateQuantity('free', 1)}
-                                onDecrease={() => updateQuantity('free', -1)}
-                            />
-                        </View>
+                        <TicketType
+                            title="Entrada gratuita"
+                            price="0 €"
+                            subtitles={[
+                                'Menor de 18 años',
+                                'Con discapacidad >= 33% + Acompañante',
+                            ]}
+                            quantity={quantities.free}
+                            onIncrease={() => updateQuantity('free', 1)}
+                            onDecrease={() => updateQuantity('free', -1)}
+                        />
                     </View>
                 </ScrollView>
 
@@ -163,26 +175,6 @@ const styles = StyleSheet.create({
     },
     ticketSection: {
         padding: 20,
-    },
-    ticketType: {
-        marginBottom: 20,
-        borderBottomWidth: 1,
-        borderBottomColor: '#333',
-    },
-    ticketTitle: {
-        color: '#fff',
-        fontSize: 18,
-        fontWeight: 'bold',
-    },
-    price: {
-        color: '#4CC9F0',
-        fontSize: 24,
-        marginVertical: 10,
-    },
-    subtitle: {
-        color: '#999',
-        fontSize: 14,
-        marginBottom: 4,
     },
     footer: {
         padding: 20,

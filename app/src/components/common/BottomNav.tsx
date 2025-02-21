@@ -1,14 +1,14 @@
 import React, {useState} from 'react';
 import { View, TouchableOpacity, Image, Text, StyleSheet } from 'react-native';
 import {NavigationProp, useNavigation} from '@react-navigation/native';
-import QRTicketModal from '../modals/QRTicketModal';
+import QRTicketModal from '../../modals/QRTicketModal';
 
 const BottomNav = () => {
     const navigation = useNavigation<NavigationProp<any>>();
     const [qrModalVisible, setQrModalVisible] = useState(false);
     const movie = {
         title: 'Gaza Mi Amor',
-        image: require('../assets/images/Movie1.png'), // Adjust the path as needed
+        image: require('../../assets/images/Movie1.png'), // Adjust the path as needed
     };
     const selectedDate = 'Miércoles 15 de Enero';
     const selectedTime = '17:00';
@@ -20,7 +20,7 @@ const BottomNav = () => {
                 style={styles.navItem}
             >
                 <Image
-                    source={require('../assets/icons/map.png')}
+                    source={require('../../assets/icons/map.png')}
                     style={styles.navIcon}
                 />
                 <Text style={styles.navText}>Cine</Text>
@@ -30,7 +30,7 @@ const BottomNav = () => {
                 onPress={() => setQrModalVisible(true)}
             >
                 <Image
-                    source={require('../assets/icons/QR.png')}
+                    source={require('../../assets/icons/QR.png')}
                     style={styles.navIcon}
                 />
                 <Text style={styles.navText}>Entradas</Text>
@@ -40,7 +40,7 @@ const BottomNav = () => {
                 style={styles.navItem}
             >
                 <Image
-                    source={require('../assets/icons/user.png')}
+                    source={require('../../assets/icons/user.png')}
                     style={styles.navIcon}
                 />
                 <Text style={styles.navText}>Perfil</Text>

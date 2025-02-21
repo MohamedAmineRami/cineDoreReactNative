@@ -1,8 +1,8 @@
 import React from 'react';
 import {StyleSheet, Text, SafeAreaView, ScrollView, ImageBackground, TouchableOpacity} from 'react-native';
-import Header from '../../components/Header';
+import Header from '../../components/common/Header';
 import Section from '../../components/Section';
-import BottomNav from '../../components/BottomNav';
+import BottomNav from '../../components/common/BottomNav';
 import {NavigationProp, useNavigation} from "@react-navigation/native";
 
 const Cine = () => {
