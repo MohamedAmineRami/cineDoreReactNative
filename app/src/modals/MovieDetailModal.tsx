@@ -1,6 +1,5 @@
-// src/components/MovieDetailModal/MovieDetailModal.tsx
 import React, { useState, useEffect } from 'react';
-import { View, Text, Modal, TouchableOpacity, Image, StyleSheet } from 'react-native';
+import {View, Text, Modal, TouchableOpacity, Image, StyleSheet, ActivityIndicator} from 'react-native';
 import TabNavigation from '../components/TabNavigation';
 import TicketPurchaseModal from '../modals/TicketPurchaseModal';
 import { fetchMovieById } from '../services/movies';
@@ -8,7 +7,7 @@ import { Movie } from '../types';
 
 interface MovieDetailModalProps {
     visible: boolean;
-    movieId: number | null; // Pass movieId instead of the entire movie object
+    movieId: number | null;
     onClose: () => void;
 }
 
@@ -17,33 +16,90 @@ const MovieDetailModal: React.FC<MovieDetailModalProps> = ({ visible, movieId, o
     const [showTicketPurchase, setShowTicketPurchase] = useState(false);
     const [selectedDate, setSelectedDate] = useState('');
     const [selectedTime, setSelectedTime] = useState('');
-    const [movie, setMovie] = useState<Movie | null>(null); // State to store movie details
+    const [selectedSala, setSelectedSala] = useState('');
+    const [movie, setMovie] = useState<Movie | null>(null);
+    const [loading, setLoading] = useState(false);
+    const [error, setError] = useState<string | null>(null);
 
     // Fetch movie details when movieId changes
     useEffect(() => {
         if (movieId) {
             const loadMovieDetails = async () => {
                 try {
+                    setLoading(true);
+                    setError(null);
                     const data = await fetchMovieById(movieId);
                     setMovie(data);
                 } catch (error) {
                     console.error('Failed to load movie details:', error);
+                    setError('No se pudieron cargar los detalles de la película');
+                } finally {
+                    setLoading(false);
                 }
             };
             loadMovieDetails();
+        } else {
+            setMovie(null);
         }
     }, [movieId]);
 
-    if (!movie) return null;
+    if (!visible) return null;
 
-    // Format the movie's functions into schedules
+    if (loading) {
+        return (
+            <Modal
+                animationType="slide"
+                transparent={true}
+                visible={visible}
+                onRequestClose={onClose}
+                statusBarTranslucent={true}
+            >
+                <View style={styles.modalContainer}>
+                    <View style={styles.modalContent}>
+                        <ActivityIndicator size="large" color="#4361EE" />
+                        <Text style={styles.loadingText}>Cargando detalles...</Text>
+                    </View>
+                </View>
+            </Modal>
+        );
+    }
+
+    if (error || !movie) {
+        return (
+            <Modal
+                animationType="slide"
+                transparent={true}
+                visible={visible}
+                onRequestClose={onClose}
+                statusBarTranslucent={true}
+            >
+                <View style={styles.modalContainer}>
+                    <View style={styles.modalContent}>
+                        <Text style={styles.errorText}>{error || 'No se encontró la película'}</Text>
+                        <TouchableOpacity style={styles.backButton} onPress={onClose}>
+                            <Text style={styles.backButtonText}>← Atrás</Text>
+                        </TouchableOpacity>
+                    </View>
+                </View>
+            </Modal>
+        );
+    }
+
+    // Format the movie's functions into schedules by date
     const schedules = movie.funciones.reduce((acc, funcion) => {
-        const date = new Date(funcion.fechaHora).toLocaleDateString();
-        const time = new Date(funcion.fechaHora).toLocaleTimeString();
+        // Parse the ISO date string
+        const dateTime = new Date(funcion.fechaHora);
+        // Format the date as a string (e.g. "25/02/2025")
+        const date = dateTime.toLocaleDateString('es-ES');
+        // Format the time as a string (e.g. "19:30")
+        const time = dateTime.toLocaleTimeString('es-ES', { hour: '2-digit', minute: '2-digit' });
+
         if (!acc[date]) acc[date] = [];
-        acc[date].push(time);
+
+        // Add the time and sala to the array for this date
+        acc[date].push({ time, sala: funcion.sala });
         return acc;
-    }, {} as { [key: string]: string[] });
+    }, {} as { [key: string]: { time: string, sala: string }[] });
 
     return (
         <>
@@ -70,28 +126,36 @@ const MovieDetailModal: React.FC<MovieDetailModalProps> = ({ visible, movieId, o
 
                         <View style={styles.detailsContainer}>
                             <View style={styles.titleContainer}>
-                                <Text style={styles.age}>18</Text>
+                                <Text style={styles.age}>{movie.clasificacion}</Text>
                                 <Text style={styles.title}>{movie.nombre}</Text>
-                                <Text style={styles.duration}>Drama | {movie.anio} {movie.duracion}m VOSE</Text>
+                                <Text style={styles.duration}>
+                                    {movie.categoria} | {movie.anio} | {movie.duracion}m | {movie.lenguaje}
+                                </Text>
                             </View>
 
                             {activeTab === 'Horarios' ? (
                                 <View style={styles.scheduleContainer}>
-                                    {Object.entries(schedules).map(([date, times]) => (
-                                        <TouchableOpacity
-                                            key={date}
-                                            style={styles.scheduleItem}
-                                            onPress={() => {
-                                                setSelectedDate(date);
-                                                setSelectedTime(times[0]);
-                                                setShowTicketPurchase(true);
-                                            }}
-                                        >
+                                    {Object.entries(schedules).map(([date, timeSlots]) => (
+                                        <View key={date} style={styles.dateBlock}>
                                             <Text style={styles.scheduleDate}>{date}</Text>
-                                            {times.map((time, index) => (
-                                                <Text key={index} style={styles.scheduleTime}>{time}</Text>
-                                            ))}
-                                        </TouchableOpacity>
+                                            <View style={styles.timesContainer}>
+                                                {timeSlots.map((slot, index) => (
+                                                    <TouchableOpacity
+                                                        key={index}
+                                                        style={styles.timeSlot}
+                                                        onPress={() => {
+                                                            setSelectedDate(date);
+                                                            setSelectedTime(slot.time);
+                                                            setSelectedSala(slot.sala);
+                                                            setShowTicketPurchase(true);
+                                                        }}
+                                                    >
+                                                        <Text style={styles.scheduleTime}>{slot.time}</Text>
+                                                        <Text style={styles.scheduleSala}>Sala: {slot.sala}</Text>
+                                                    </TouchableOpacity>
+                                                ))}
+                                            </View>
+                                        </View>
                                     ))}
                                 </View>
                             ) : (
@@ -115,6 +179,7 @@ const MovieDetailModal: React.FC<MovieDetailModalProps> = ({ visible, movieId, o
                 movie={movie}
                 selectedDate={selectedDate}
                 selectedTime={selectedTime}
+                selectedSala={selectedSala}
             />
         </>
     );
@@ -127,6 +192,52 @@ const styles = StyleSheet.create({
     },
     modalContent: {
         flex: 1,
+    },
+    loadingText: {
+        fontSize: 16,
+        marginTop: 10,
+        color: '#333',
+    },
+    errorText: {
+        fontSize: 16,
+        color: '#ff3b30',
+        marginBottom: 20,
+        textAlign: 'center',
+    },
+    dateBlock: {
+        marginBottom: 16,
+        borderBottomWidth: 1,
+        borderBottomColor: '#eee',
+        paddingBottom: 12,
+    },
+    scheduleDate: {
+        fontSize: 18,
+        fontWeight: 'bold',
+        marginBottom: 8,
+        color: '#333',
+    },
+    timesContainer: {
+        flexDirection: 'row',
+        flexWrap: 'wrap',
+    },
+    timeSlot: {
+        backgroundColor: '#f0f0f0',
+        padding: 10,
+        borderRadius: 8,
+        marginRight: 10,
+        marginBottom: 10,
+        minWidth: 80,
+        alignItems: 'center',
+    },
+    scheduleTime: {
+        fontSize: 16,
+        fontWeight: '600',
+        color: '#333',
+    },
+    scheduleSala: {
+        fontSize: 12,
+        color: '#666',
+        marginTop: 4,
     },
     backButton: {
         position: 'absolute',
@@ -173,16 +284,6 @@ const styles = StyleSheet.create({
     },
     scheduleItem: {
         marginBottom: 16,
-    },
-    scheduleDate: {
-        color: '#fff',
-        fontSize: 16,
-        marginBottom: 4,
-    },
-    scheduleTime: {
-        color: '#5DD9FA',
-        fontSize: 20,
-        fontWeight: 'bold',
     },
     synopsisContainer: {},
     sectionTitle: {

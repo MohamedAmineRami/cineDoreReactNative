@@ -2,15 +2,32 @@ import React, { useState } from 'react';
 import { Modal, View, Text, TouchableOpacity, Image, StyleSheet, ScrollView, SafeAreaView } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
 import QuantityControl from '../components/QuantityControl';
+import {Movie} from "../types";
 
-const TicketPurchaseModal = ({ visible, onClose, movie, selectedDate, selectedTime }) => {
+interface TicketPurchaseModalProps {
+    visible: boolean;
+    onClose: () => void;
+    movie: Movie | null;
+    selectedDate: string;
+    selectedTime: string;
+    selectedSala: string;
+}
+
+const TicketPurchaseModal: React.FC<TicketPurchaseModalProps> = ({
+                                                                     visible,
+                                                                     onClose,
+                                                                     movie,
+                                                                     selectedDate,
+                                                                     selectedTime,
+                                                                     selectedSala
+                                                                 }) => {
     const [quantities, setQuantities] = useState({
         general: 0,
         reduced: 0,
         free: 0,
     });
 
-    const updateQuantity = (type, increment) => {
+    const updateQuantity = (type: string, increment: number) => {
         setQuantities((prev) => ({
             ...prev,
             [type]: Math.max(0, prev[type] + increment),
@@ -18,6 +35,8 @@ const TicketPurchaseModal = ({ visible, onClose, movie, selectedDate, selectedTi
     };
 
     const total = (quantities.general * 3 + quantities.reduced * 2).toFixed(2);
+
+    if (!movie) return null;
 
     return (
         <Modal
@@ -32,15 +51,15 @@ const TicketPurchaseModal = ({ visible, onClose, movie, selectedDate, selectedTi
                 </TouchableOpacity>
 
                 <ScrollView style={styles.purchaseContent}>
-                    <Image source={movie?.image} style={styles.movieBanner} />
+                    <Image source={{ uri: movie.imagenPoster }} style={styles.movieBanner} />
 
                     <View style={styles.movieInfo}>
                         <View style={styles.ageRating}>
-                            <Text style={styles.ageText}>18</Text>
+                            <Text style={styles.ageText}>{movie.clasificacion}</Text>
                         </View>
-                        <Text style={styles.movieTitle}>{movie?.title}</Text>
+                        <Text style={styles.movieTitle}>{movie.nombre}</Text>
                         <Text style={styles.movieTime}>
-                            {selectedDate} - {selectedTime} - Sala: 1
+                            {selectedDate} - {selectedTime} - Sala: {selectedSala}
                         </Text>
                     </View>
 
@@ -91,8 +110,12 @@ const TicketPurchaseModal = ({ visible, onClose, movie, selectedDate, selectedTi
                     </View>
 
                     <TouchableOpacity
-                        style={styles.purchaseButton}
+                        style={[
+                            styles.purchaseButton,
+                            (quantities.general + quantities.reduced + quantities.free === 0) && styles.disabledButton
+                        ]}
                         onPress={onClose}
+                        disabled={quantities.general + quantities.reduced + quantities.free === 0}
                     >
                         <LinearGradient
                             colors={['#4CC9F0', '#4361EE']}
@@ -204,6 +227,9 @@ const styles = StyleSheet.create({
         color: '#fff',
         fontSize: 24,
         fontWeight: 'bold',
+    },
+    disabledButton: {
+        opacity: 0.5,
     },
     purchaseButton: {
         marginBottom: 10,

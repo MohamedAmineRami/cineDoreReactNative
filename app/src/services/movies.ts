@@ -1,9 +1,10 @@
 import api from './api';
-import {Movie} from "../types";
+import { Movie } from "../types";
 
 export const fetchMovies = async () => {
     try {
-        const response = await api.get('/peliculas');
+        // Update endpoint to use peliculasDTO instead of peliculas
+        const response = await api.get('/peliculasDTO');
         return response.data;
     } catch (error) {
         console.error('Error fetching movies:', error);
@@ -13,7 +14,8 @@ export const fetchMovies = async () => {
 
 export const fetchMovieById = async (id: number): Promise<Movie> => {
     try {
-        const response = await api.get(`/peliculas/${id}`);
+        // Update endpoint to use peliculasDTO instead of peliculas
+        const response = await api.get(`/peliculasDTO/${id}`);
         return response.data;
     } catch (error) {
         console.error('Error fetching movie details:', error);

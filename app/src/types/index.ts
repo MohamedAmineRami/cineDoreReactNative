@@ -14,6 +14,7 @@ export interface Movie {
 }
 
 export interface Funcion {
+    id: number;
     fechaHora: string;
     sala: string;
 }
