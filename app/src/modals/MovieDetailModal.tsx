@@ -21,7 +21,6 @@ const MovieDetailModal: React.FC<MovieDetailModalProps> = ({ visible, movieId, o
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState<string | null>(null);
 
-    // Fetch movie details when movieId changes
     useEffect(() => {
         if (movieId) {
             const loadMovieDetails = async () => {
@@ -85,93 +84,88 @@ const MovieDetailModal: React.FC<MovieDetailModalProps> = ({ visible, movieId, o
         );
     }
 
-    // Format the movie's functions into schedules by date
     const schedules = movie.funciones.reduce((acc, funcion) => {
-        // Parse the ISO date string
         const dateTime = new Date(funcion.fechaHora);
-        // Format the date as a string (e.g. "25/02/2025")
         const date = dateTime.toLocaleDateString('es-ES');
-        // Format the time as a string (e.g. "19:30")
         const time = dateTime.toLocaleTimeString('es-ES', { hour: '2-digit', minute: '2-digit' });
 
         if (!acc[date]) acc[date] = [];
 
-        // Add the time and sala to the array for this date
         acc[date].push({ time, sala: funcion.sala });
         return acc;
     }, {} as { [key: string]: { time: string, sala: string }[] });
 
     return (
-        <>
-            <Modal
-                animationType="slide"
-                transparent={true}
-                visible={visible}
-                onRequestClose={onClose}
-                statusBarTranslucent={true}
-            >
-                <View style={styles.modalContainer}>
-                    <View style={styles.modalContent}>
-                        <TouchableOpacity style={styles.backButton} onPress={onClose}>
-                            <Text style={styles.backButtonText}>← Atrás</Text>
-                        </TouchableOpacity>
+        <Modal
+            animationType="slide"
+            transparent={true}
+            visible={visible}
+            onRequestClose={onClose}
+            statusBarTranslucent={true}
+        >
+            <View style={styles.modalContainer}>
+                <View style={styles.modalContent}>
+                    <TouchableOpacity style={styles.backButton} onPress={onClose}>
+                        <Text style={styles.backButtonText}>← Atrás</Text>
+                    </TouchableOpacity>
 
-                        <Image source={{ uri: movie.imagenPoster }} style={styles.modalImage} />
+                    <Image source={{ uri: movie.imagenPoster }} style={styles.modalImage} />
 
-                        <TabNavigation
-                            tabs={['Horarios', 'Sinopsis']}
-                            activeTab={activeTab}
-                            onTabPress={setActiveTab}
-                        />
+                    <TabNavigation
+                        tabs={['Horarios', 'Sinopsis']}
+                        activeTab={activeTab}
+                        onTabPress={setActiveTab}
+                    />
 
-                        <View style={styles.detailsContainer}>
-                            <View style={styles.titleContainer}>
-                                <Text style={styles.age}>{movie.clasificacion}</Text>
-                                <Text style={styles.title}>{movie.nombre}</Text>
-                                <Text style={styles.duration}>
-                                    {movie.categoria} | {movie.anio} | {movie.duracion}m | {movie.lenguaje}
-                                </Text>
-                            </View>
-
-                            {activeTab === 'Horarios' ? (
-                                <View style={styles.scheduleContainer}>
-                                    {Object.entries(schedules).map(([date, timeSlots]) => (
-                                        <View key={date} style={styles.dateBlock}>
-                                            <Text style={styles.scheduleDate}>{date}</Text>
-                                            <View style={styles.timesContainer}>
-                                                {timeSlots.map((slot, index) => (
-                                                    <TouchableOpacity
-                                                        key={index}
-                                                        style={styles.timeSlot}
-                                                        onPress={() => {
-                                                            setSelectedDate(date);
-                                                            setSelectedTime(slot.time);
-                                                            setSelectedSala(slot.sala);
-                                                            setShowTicketPurchase(true);
-                                                        }}
-                                                    >
-                                                        <Text style={styles.scheduleTime}>{slot.time}</Text>
-                                                        <Text style={styles.scheduleSala}>Sala: {slot.sala}</Text>
-                                                    </TouchableOpacity>
-                                                ))}
-                                            </View>
-                                        </View>
-                                    ))}
-                                </View>
-                            ) : (
-                                <View style={styles.synopsisContainer}>
-                                    <Text style={styles.sectionTitle}>Formato:</Text>
-                                    <Text style={styles.format}>{movie.formato}</Text>
-                                    <Text style={styles.formatDetails}>{movie.color}</Text>
-
-                                    <Text style={styles.sectionTitle}>Información de la película</Text>
-                                    <Text style={styles.synopsis}>{movie.sinopsis}</Text>
-                                </View>
-                            )}
+                    <View style={styles.detailsContainer}>
+                        <View style={styles.titleRow}>
+                            <Text style={styles.ageBadge}>{movie.clasificacion}</Text>
+                            <Text style={styles.movieTitle}>{movie.nombre}</Text>
                         </View>
+                        <Text style={styles.movieDetails}>
+                            {movie.categoria} | {movie.anio} | {movie.duracion}m | {movie.lenguaje}
+                        </Text>
+
+                        {activeTab === 'Horarios' ? (
+                            <View style={styles.scheduleContainer}>
+                                {Object.entries(schedules).map(([date, timeSlots]) => (
+                                    <View key={date} style={styles.timesContainer}>
+                                        {timeSlots.map((slot, index) => (
+                                            <TouchableOpacity
+                                                key={`${date}-${index}`} // Ensuring unique key
+                                                style={styles.timeSlot}
+                                                onPress={() => {
+                                                    setSelectedDate(date);
+                                                    setSelectedTime(slot.time);
+                                                    setSelectedSala(slot.sala);
+                                                    setShowTicketPurchase(true);
+                                                }}
+                                            >
+                                                <Text style={styles.scheduleDate}>{date}</Text>
+                                                <Text style={styles.scheduleTime}>{slot.time}</Text>
+                                                <Text style={styles.scheduleSala}>{slot.sala}</Text>
+                                            </TouchableOpacity>
+                                        ))}
+                                    </View>
+                                ))}
+                            </View>
+                        ) : (
+                            <View style={styles.synopsisContainer}>
+                                <Text style={styles.sectionTitle}>Formato:</Text>
+                                <View style={styles.formatContainer}>
+                                    <View style={styles.formatDetails}>
+                                        <Text style={styles.formatType}>{movie.formato}</Text>
+                                        <Text style={styles.formatColor}>{movie.color}</Text>
+                                    </View>
+                                </View>
+
+                                <Text style={styles.sectionTitle}>Información de la película</Text>
+                                <Text style={styles.synopsis}>{movie.sinopsis}</Text>
+                            </View>
+                        )}
                     </View>
                 </View>
-            </Modal>
+            </View>
 
             <TicketPurchaseModal
                 visible={showTicketPurchase}
@@ -181,7 +175,7 @@ const MovieDetailModal: React.FC<MovieDetailModalProps> = ({ visible, movieId, o
                 selectedTime={selectedTime}
                 selectedSala={selectedSala}
             />
-        </>
+        </Modal>
     );
 };
 
@@ -192,6 +186,79 @@ const styles = StyleSheet.create({
     },
     modalContent: {
         flex: 1,
+    },
+    backButton: {
+        position: 'absolute',
+        top: 40,
+        left: 16,
+        zIndex: 1,
+    },
+    backButtonText: {
+        color: '#fff',
+        fontSize: 16,
+    },
+    modalImage: {
+        width: '100%',
+        height: 450,
+    },
+    detailsContainer: {
+        flex: 1,
+        padding: 16,
+    },
+    titleRow: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        marginBottom: 4,
+    },
+    ageBadge: {
+        backgroundColor: '#1e2a38',
+        color: '#fff',
+        fontSize: 14,
+        fontWeight: 'bold',
+        paddingHorizontal: 8,
+        paddingVertical: 4,
+        borderRadius: 4,
+        marginRight: 8,
+    },
+    movieTitle: {
+        color: '#fff',
+        fontSize: 22,
+        fontWeight: 'bold',
+    },
+    movieDetails: {
+        color: '#b0b0b0',
+        fontSize: 14,
+    },
+    formatContainer: {
+        marginTop: 12,
+        backgroundColor: 'transparent',
+        padding: 8,
+        borderWidth: 0.5,
+        borderColor: '#454545',
+    },
+    formatDetails: {
+        flexDirection: 'row',
+        justifyContent: 'space-between',
+        marginTop: 4,
+    },
+    formatType: {
+        color: '#fff',
+        fontSize: 14,
+    },
+    formatColor: {
+        color: '#fff',
+        fontSize: 14,
+    },
+    sectionTitle: {
+        color: '#fff',
+        fontSize: 16,
+        marginTop: 12,
+        fontWeight: 'bold',
+    },
+    synopsis: {
+        color: '#b0b0b0',
+        fontSize: 14,
+        lineHeight: 20,
     },
     loadingText: {
         fontSize: 16,
@@ -206,19 +273,15 @@ const styles = StyleSheet.create({
     },
     dateBlock: {
         marginBottom: 16,
-        borderBottomWidth: 1,
-        borderBottomColor: '#eee',
-        paddingBottom: 12,
     },
     scheduleDate: {
         fontSize: 18,
         fontWeight: 'bold',
         marginBottom: 8,
-        color: '#333',
+        color: '#000',
     },
     timesContainer: {
         flexDirection: 'row',
-        flexWrap: 'wrap',
     },
     timeSlot: {
         backgroundColor: '#f0f0f0',
@@ -238,24 +301,6 @@ const styles = StyleSheet.create({
         fontSize: 12,
         color: '#666',
         marginTop: 4,
-    },
-    backButton: {
-        position: 'absolute',
-        top: 40,
-        left: 16,
-        zIndex: 1,
-    },
-    backButtonText: {
-        color: '#fff',
-        fontSize: 16,
-    },
-    modalImage: {
-        width: '100%',
-        height: 450,
-    },
-    detailsContainer: {
-        flex: 1,
-        padding: 16,
     },
     titleContainer: {
         marginBottom: 24,
@@ -286,25 +331,6 @@ const styles = StyleSheet.create({
         marginBottom: 16,
     },
     synopsisContainer: {},
-    sectionTitle: {
-        color: '#fff',
-        fontSize: 16,
-        marginBottom: 8,
-    },
-    format: {
-        color: '#888',
-        fontSize: 14,
-    },
-    formatDetails: {
-        color: '#888',
-        fontSize: 14,
-        marginTop: 4,
-    },
-    synopsis: {
-        color: '#888',
-        fontSize: 14,
-        lineHeight: 20,
-    },
 });
 
 export default MovieDetailModal;

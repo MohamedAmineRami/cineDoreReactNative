@@ -18,3 +18,37 @@ export interface Funcion {
     fechaHora: string;
     sala: string;
 }
+
+export interface CompraDTO {
+    usuarioId: number;
+    funcionId: number;
+    totalPago: number;
+    tickets: TicketEntradaDTO[];
+}
+
+export interface TicketEntradaDTO {
+    codigoQr: string;
+    estadoId: number;
+}
+
+export interface TicketDisplayDTO {
+    funcionId: number;
+    totalPago: number;
+    codigoQr: string;
+    fechaFuncion: string;
+    tituloPelicula: string;
+    imagenPelicula: string;
+    clasificacion: string;
+    lenguaje: string;
+    duracion: number;
+    cantidadTickets: number;
+}
+
+export interface TicketPurchaseModalProps {
+    visible: boolean;
+    onClose: () => void;
+    movie: Movie | null;
+    selectedDate: string;
+    selectedTime: string;
+    selectedSala: string;
+}

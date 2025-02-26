@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import {TouchableOpacity, Image, StyleSheet, ActivityIndicator, View, Text} from 'react-native';
-import { Movie } from '../../types'; // Define a Movie type in src/types/index.ts
+import { Movie } from '../../types';
 
 interface MovieCardProps {
     movie: Movie;
@@ -14,7 +14,6 @@ const MovieCard: React.FC<MovieCardProps> = ({ movie, onPress }) => {
     return (
         <TouchableOpacity style={styles.container} onPress={onPress}>
             <Image
-                defaultSource={require('../../assets/images/Imagen_default.png')}
                 source={{ uri: movie.imagenPoster }}
                 style={styles.poster}
                 onError={(error) => {
@@ -43,14 +42,16 @@ const MovieCard: React.FC<MovieCardProps> = ({ movie, onPress }) => {
 const styles = StyleSheet.create({
     container: {
         width: '48%',
-        margin: '1%',
         borderRadius: 8,
         overflow: 'hidden',
+        padding: 8,
+        marginLeft: 7,
+
     },
     poster: {
-        width: '100%',
+        width: '98%',
         height: 250,
-        borderRadius: 8,
+        borderRadius: 20,
     },
     errorContainer: {
         backgroundColor: '#f8f8f8',

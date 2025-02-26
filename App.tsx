@@ -10,6 +10,7 @@ import Register from './app/src/screens/auth/Register';
 import CineScreen from "./app/src/screens/main/Cine";
 import HomeScreen from "./app/src/screens/main/Home";
 import Profile from "./app/src/screens/main/Profile";
+import { AuthProvider } from './app/src/context/AuthContext';
 
 type RootStackParamList = {
     Welcome: undefined;
@@ -58,6 +59,7 @@ export default function App() {
     }
 
     return (
+        <AuthProvider>
         <NavigationContainer>
             <Stack.Navigator id={undefined}>
                 {user ? (
@@ -101,5 +103,6 @@ export default function App() {
                 )}
             </Stack.Navigator>
         </NavigationContainer>
+        </AuthProvider>
     );
 }

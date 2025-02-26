@@ -2,16 +2,10 @@ import React, { useState } from 'react';
 import { Modal, View, Text, TouchableOpacity, Image, StyleSheet, ScrollView, SafeAreaView } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
 import QuantityControl from '../components/QuantityControl';
-import {Movie} from "../types";
+import {CompraDTO, TicketPurchaseModalProps} from "../types";
+import {createTicket, getTicketsByUserId} from "../services/ticket";
+import * as SecureStore from 'expo-secure-store';
 
-interface TicketPurchaseModalProps {
-    visible: boolean;
-    onClose: () => void;
-    movie: Movie | null;
-    selectedDate: string;
-    selectedTime: string;
-    selectedSala: string;
-}
 
 const TicketPurchaseModal: React.FC<TicketPurchaseModalProps> = ({
                                                                      visible,
@@ -19,7 +13,7 @@ const TicketPurchaseModal: React.FC<TicketPurchaseModalProps> = ({
                                                                      movie,
                                                                      selectedDate,
                                                                      selectedTime,
-                                                                     selectedSala
+                                                                     selectedSala,
                                                                  }) => {
     const [quantities, setQuantities] = useState({
         general: 0,
@@ -27,7 +21,7 @@ const TicketPurchaseModal: React.FC<TicketPurchaseModalProps> = ({
         free: 0,
     });
 
-    const updateQuantity = (type: string, increment: number) => {
+    const updateQuantity = (type: keyof typeof quantities, increment: number) => {
         setQuantities((prev) => ({
             ...prev,
             [type]: Math.max(0, prev[type] + increment),
@@ -35,6 +29,35 @@ const TicketPurchaseModal: React.FC<TicketPurchaseModalProps> = ({
     };
 
     const total = (quantities.general * 3 + quantities.reduced * 2).toFixed(2);
+
+    const handlePurchase = async () => {
+        if (!movie) return;
+
+        const userId = await SecureStore.getItemAsync('userId');
+
+        if (!userId) {
+            console.error('User ID not found');
+            return;
+        }
+
+        const ticketData: CompraDTO = {
+            usuarioId: parseInt(userId, 10),
+            funcionId: movie.id,
+            totalPago: parseFloat(total),
+            tickets: Array.from({ length: quantities.general + quantities.reduced + quantities.free }, () => ({
+                codigoQr: `qr-code-${Math.random().toString(36).substring(7)}`,
+                estadoId: 1,
+            })),
+        };
+
+        try {
+            await createTicket(ticketData);
+            onClose();
+
+        } catch (error) {
+            console.error('Error purchasing ticket:', error);
+        }
+    };
 
     if (!movie) return null;
 
@@ -77,11 +100,6 @@ const TicketPurchaseModal: React.FC<TicketPurchaseModalProps> = ({
                         <View style={styles.ticketType}>
                             <Text style={styles.ticketTitle}>Entrada reducida</Text>
                             <Text style={styles.price}>2 €</Text>
-                            <Text style={styles.subtitle}>Estudiantes</Text>
-                            <Text style={styles.subtitle}>Familias numerosas</Text>
-                            <Text style={styles.subtitle}>Grupos vinculados a instituciones culturales o educativas</Text>
-                            <Text style={styles.subtitle}>Mayores a 65 años</Text>
-                            <Text style={styles.subtitle}>En situación de desempleo</Text>
                             <QuantityControl
                                 quantity={quantities.reduced}
                                 onIncrease={() => updateQuantity('reduced', 1)}
@@ -92,8 +110,6 @@ const TicketPurchaseModal: React.FC<TicketPurchaseModalProps> = ({
                         <View style={styles.ticketType}>
                             <Text style={styles.ticketTitle}>Entrada gratuita</Text>
                             <Text style={styles.price}>0 €</Text>
-                            <Text style={styles.subtitle}>Menor de 18 años</Text>
-                            <Text style={styles.subtitle}>Con discapacidad {'>'}= 33% + Acompañante</Text>
                             <QuantityControl
                                 quantity={quantities.free}
                                 onIncrease={() => updateQuantity('free', 1)}
@@ -114,7 +130,7 @@ const TicketPurchaseModal: React.FC<TicketPurchaseModalProps> = ({
                             styles.purchaseButton,
                             (quantities.general + quantities.reduced + quantities.free === 0) && styles.disabledButton
                         ]}
-                        onPress={onClose}
+                        onPress={handlePurchase}
                         disabled={quantities.general + quantities.reduced + quantities.free === 0}
                     >
                         <LinearGradient

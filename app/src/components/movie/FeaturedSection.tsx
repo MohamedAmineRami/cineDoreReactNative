@@ -1,4 +1,3 @@
-// src/components/FeaturedSection/FeaturedSection.tsx
 import React from 'react';
 import { View, Image, Text, StyleSheet } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
@@ -21,7 +20,7 @@ const FeaturedSection = () => {
                         end={{ x: 1, y: 0 }}
                         style={styles.gradient}
                     >
-                        <Text style={styles.bannerText}>Cerrado: 1 y 6 Enero</Text>
+                        <Text style={styles.bannerText}>Instalaciones cerradas: 1 y 6 Enero</Text>
                     </LinearGradient>
                 </View>
             </View>
@@ -56,25 +55,27 @@ const styles = StyleSheet.create({
         color: '#fff',
         fontSize: 24,
         fontWeight: 'bold',
-        marginTop: 8,
         marginLeft: 15,
     },
     banner: {
+        position: 'relative',
+        top: 15,
+        right: 20,
         padding: 8,
         marginTop: 12,
     },
     gradient: {
-        width: 250,
-        height: 30,
+        width: 300,
+        height: 40,
         alignItems: 'center',
         justifyContent: 'center',
-        borderRadius: 10,
-        borderWidth: 1,
+        borderRadius: 12,
         marginLeft: 45,
     },
     bannerText: {
         color: '#fff',
         fontSize: 14,
+        fontWeight: 'bold',
     },
 });
 

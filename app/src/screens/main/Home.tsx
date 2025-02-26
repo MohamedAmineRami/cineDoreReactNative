@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { SafeAreaView, ScrollView, StyleSheet } from 'react-native';
+import { LinearGradient } from 'expo-linear-gradient';
 import PalestineBanner from '../../palestinaBanner/PalestineBanner';
 import Header from '../../components/Header';
 import BottomNav from '../../components/BottomNav';
@@ -28,35 +29,43 @@ const Home = () => {
     }, []);
 
     const handleMoviePress = (movie: Movie) => {
-        setSelectedMovieId(movie.id); // Movie type has an id property
+        setSelectedMovieId(movie.id);
         setModalVisible(true);
     };
 
     return (
-        <SafeAreaView style={styles.container}>
-            <PalestineBanner
-                statement="We stand in solidarity with the people of palestine."
-                externalLink="https://blog.paulbiggar.com/i-cant-sleep/"
-            />
-            <ScrollView style={styles.scrollContent}>
-                <Header />
-                <FeaturedSection />
-                <MovieGrid movies={movies} onMoviePress={handleMoviePress} />
-            </ScrollView>
-            <BottomNav />
-            <MovieDetailModal
-                visible={modalVisible}
-                movieId={selectedMovieId}
-                onClose={() => setModalVisible(false)}
-            />
-        </SafeAreaView>
+        <LinearGradient
+            colors={['#00060F', '#041B35']}
+            style={styles.gradient}
+        >
+            <SafeAreaView style={styles.container}>
+                <PalestineBanner
+                    statement="We stand in solidarity with the people of palestine."
+                    externalLink="https://blog.paulbiggar.com/i-cant-sleep/"
+                />
+                <ScrollView style={styles.scrollContent}>
+                    <Header />
+                    <FeaturedSection />
+                    <MovieGrid movies={movies} onMoviePress={handleMoviePress} />
+                </ScrollView>
+                <BottomNav />
+                <MovieDetailModal
+                    visible={modalVisible}
+                    movieId={selectedMovieId}
+                    onClose={() => setModalVisible(false)}
+                />
+            </SafeAreaView>
+        </LinearGradient>
     );
 };
 
 const styles = StyleSheet.create({
+    gradient: {
+        flex: 1,
+    },
     container: {
         flex: 1,
-        backgroundColor: '#000',
+        backgroundColor: 'transparent',
     },
     scrollContent: {
         flex: 1,

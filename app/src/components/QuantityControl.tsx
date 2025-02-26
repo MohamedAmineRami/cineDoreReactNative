@@ -1,4 +1,3 @@
-// components/QuantityControl.tsx
 import React from 'react';
 import { View, Text, TouchableOpacity, StyleSheet } from 'react-native';
 
@@ -10,29 +9,30 @@ interface QuantityControlProps {
 
 const QuantityControl: React.FC<QuantityControlProps> = ({ quantity, onIncrease, onDecrease }) => {
     return (
-        <View style={styles.quantityControl}>
-            <TouchableOpacity onPress={onDecrease}>
-                <Text style={styles.quantityButton}>-</Text>
+        <View style={styles.container}>
+            <TouchableOpacity onPress={onDecrease} style={styles.button}>
+                <Text style={styles.buttonText}>-</Text>
             </TouchableOpacity>
             <Text style={styles.quantity}>{quantity}</Text>
-            <TouchableOpacity onPress={onIncrease}>
-                <Text style={styles.quantityButton}>+</Text>
+            <TouchableOpacity onPress={onIncrease} style={styles.button}>
+                <Text style={styles.buttonText}>+</Text>
             </TouchableOpacity>
         </View>
     );
 };
 
 const styles = StyleSheet.create({
-    quantityControl: {
+    container: {
         flexDirection: 'row',
         alignItems: 'center',
-        justifyContent: 'flex-end',
-        marginTop: 10,
     },
-    quantityButton: {
-        color: '#fff',
-        fontSize: 24,
-        paddingHorizontal: 20,
+    button: {
+        padding: 10,
+        backgroundColor: '#ddd',
+        borderRadius: 5,
+    },
+    buttonText: {
+        fontSize: 18,
     },
     quantity: {
         color: '#fff',
