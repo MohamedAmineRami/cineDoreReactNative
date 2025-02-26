@@ -48,14 +48,16 @@ const styles = StyleSheet.create({
     },
     subtitle: {
         color: '#fff',
-        fontSize: 16,
+        fontSize: 14.22,
         marginLeft: 15,
+        marginBottom:-1
     },
     title: {
         color: '#fff',
         fontSize: 24,
         fontWeight: 'bold',
         marginLeft: 15,
+        marginBottom:-30
     },
     banner: {
         position: 'relative',
