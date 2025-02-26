@@ -3,7 +3,7 @@ import { Modal, View, Text, TouchableOpacity, Image, StyleSheet, ScrollView, Saf
 import { LinearGradient } from 'expo-linear-gradient';
 import QuantityControl from '../components/QuantityControl';
 import {CompraDTO, TicketPurchaseModalProps} from "../types";
-import {createTicket, getTicketsByUserId} from "../services/ticket";
+import {createTicket} from "../services/ticket";
 import * as SecureStore from 'expo-secure-store';
 
 
@@ -82,7 +82,7 @@ const TicketPurchaseModal: React.FC<TicketPurchaseModalProps> = ({
                         </View>
                         <Text style={styles.movieTitle}>{movie.nombre}</Text>
                         <Text style={styles.movieTime}>
-                            {selectedDate} - {selectedTime} - Sala: {selectedSala}
+                            {selectedDate} - {selectedTime} - {selectedSala}
                         </Text>
                     </View>
 
@@ -121,7 +121,7 @@ const TicketPurchaseModal: React.FC<TicketPurchaseModalProps> = ({
 
                 <View style={styles.footer}>
                     <View style={styles.totalSection}>
-                        <Text style={styles.totalText}>Total (IVA incluido)</Text>
+                        <Text style={styles.totalText}>Total</Text>
                         <Text style={styles.totalAmount}>{total}€</Text>
                     </View>
 
@@ -238,6 +238,7 @@ const styles = StyleSheet.create({
     totalText: {
         color: '#fff',
         fontSize: 18,
+        fontWeight: 'bold',
     },
     totalAmount: {
         color: '#fff',
