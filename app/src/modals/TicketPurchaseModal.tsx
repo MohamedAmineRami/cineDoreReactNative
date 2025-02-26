@@ -59,6 +59,13 @@ const TicketPurchaseModal: React.FC<TicketPurchaseModalProps> = ({
         }
     };
 
+    //format the date to spanish style
+    const [day, month, year] = selectedDate.split("/").map(Number);
+    const dateToFormat = new Date(year, month - 1, day); // Month is 0-based
+
+    const options = { weekday: "long", day: "numeric", month: "long" };
+    const formattedDate = dateToFormat.toLocaleDateString("es-ES", options);
+    const capitalizedDate = formattedDate.charAt(0).toUpperCase() + formattedDate.slice(1);
     if (!movie) return null;
 
     return (
@@ -76,45 +83,72 @@ const TicketPurchaseModal: React.FC<TicketPurchaseModalProps> = ({
                 <ScrollView style={styles.purchaseContent}>
                     <Image source={{ uri: movie.imagenPoster }} style={styles.movieBanner} />
 
-                    <View style={styles.movieInfo}>
-                        <View style={styles.ageRating}>
-                            <Text style={styles.ageText}>{movie.clasificacion}</Text>
-                        </View>
+                    {/*<View style={styles.movieInfo}>*/}
+                    {/*    <View style={styles.ageRating}>*/}
+                    {/*        <Text style={styles.ageText}>{movie.clasificacion}</Text>*/}
+                    {/*    </View>*/}
+                    {/*    <Text style={styles.movieTitle}>{movie.nombre}</Text>*/}
+                    {/*    <Text style={styles.movieTime}>*/}
+                    {/*        {selectedDate} - {selectedTime} - {selectedSala}*/}
+                    {/*    </Text>*/}
+                    {/*</View>*/}
+
+                    <View
+                        style={styles.detailContainer}
+                    >
+                        <View style={styles.titleRow}>
+                        <Text style={styles.ageBadge}>{movie.clasificacion}</Text>
                         <Text style={styles.movieTitle}>{movie.nombre}</Text>
-                        <Text style={styles.movieTime}>
-                            {selectedDate} - {selectedTime} - {selectedSala}
-                        </Text>
                     </View>
+                        <View style={styles.movieDetails}>
+                            <Text
+                                style={styles.detailText}
+                            >{capitalizedDate} | {selectedSala} </Text>
+                            <Text
+                                style={styles.detailText}
+
+                            >{movie.duracion}m | {movie.lenguaje}</Text>
+                        </View></View>
+
+
 
                     <View style={styles.ticketSection}>
                         <View style={styles.ticketType}>
                             <Text style={styles.ticketTitle}>Entrada general</Text>
-                            <Text style={styles.price}>3 €</Text>
-                            <QuantityControl
-                                quantity={quantities.general}
-                                onIncrease={() => updateQuantity('general', 1)}
-                                onDecrease={() => updateQuantity('general', -1)}
-                            />
+                         <View
+                            style={styles.priceRow}
+                         >
+                             <Text style={styles.price}>3 €</Text>
+                             <QuantityControl
+                                 quantity={quantities.general}
+                                 onIncrease={() => updateQuantity('general', 1)}
+                                 onDecrease={() => updateQuantity('general', -1)}
+                             />
+                         </View>
                         </View>
 
                         <View style={styles.ticketType}>
                             <Text style={styles.ticketTitle}>Entrada reducida</Text>
-                            <Text style={styles.price}>2 €</Text>
-                            <QuantityControl
-                                quantity={quantities.reduced}
-                                onIncrease={() => updateQuantity('reduced', 1)}
-                                onDecrease={() => updateQuantity('reduced', -1)}
-                            />
+                         <View style={styles.priceRow}>
+                             <Text style={styles.price}>2 €</Text>
+                             <QuantityControl
+                                 quantity={quantities.reduced}
+                                 onIncrease={() => updateQuantity('reduced', 1)}
+                                 onDecrease={() => updateQuantity('reduced', -1)}
+                             />
+                         </View>
                         </View>
 
                         <View style={styles.ticketType}>
                             <Text style={styles.ticketTitle}>Entrada gratuita</Text>
-                            <Text style={styles.price}>0 €</Text>
-                            <QuantityControl
-                                quantity={quantities.free}
-                                onIncrease={() => updateQuantity('free', 1)}
-                                onDecrease={() => updateQuantity('free', -1)}
-                            />
+                          <View style={styles.priceRow}>
+                              <Text style={styles.price}>0 €</Text>
+                              <QuantityControl
+                                  quantity={quantities.free}
+                                  onIncrease={() => updateQuantity('free', 1)}
+                                  onDecrease={() => updateQuantity('free', -1)}
+                              />
+                          </View>
                         </View>
                     </View>
                 </ScrollView>
@@ -179,11 +213,11 @@ const styles = StyleSheet.create({
     movieInfo: {
         padding: 20,
     },
-    movieTitle: {
-        color: '#fff',
-        fontSize: 24,
-        fontWeight: 'bold',
-    },
+    // movieTitle: {
+    //     color: '#fff',
+    //     fontSize: 24,
+    //     fontWeight: 'bold',
+    // },
     movieTime: {
         color: '#999',
         fontSize: 16,
@@ -207,16 +241,23 @@ const styles = StyleSheet.create({
         marginBottom: 20,
         borderBottomWidth: 1,
         borderBottomColor: '#333',
+
     },
     ticketTitle: {
         color: '#fff',
         fontSize: 18,
         fontWeight: 'bold',
     },
+    priceRow: {
+        paddingVertical: 24,
+        flexDirection: 'row',
+        justifyContent: 'space-between',
+        alignItems: "center",
+    },
     price: {
         color: '#4CC9F0',
         fontSize: 24,
-        marginVertical: 10,
+       // marginVertical: 10,
     },
     subtitle: {
         color: '#999',
@@ -272,6 +313,39 @@ const styles = StyleSheet.create({
         color: '#4361EE',
         fontSize: 18,
     },
+    //copied from moviedetailmodal
+    titleRow: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        marginBottom: 4,
+    },
+    ageBadge: {
+        backgroundColor: '#1e2a38',
+        color: '#fff',
+        fontSize: 14,
+        fontWeight: 'bold',
+        paddingHorizontal: 8,
+        paddingVertical: 4,
+        borderRadius: 4,
+        marginRight: 8,
+    },
+    movieTitle: {
+        color: '#fff',
+        fontSize: 22,
+        fontWeight: 'bold',
+    },
+    movieDetails: {
+        flexDirection: 'row',
+        justifyContent: 'space-between',
+        color: '#b0b0b0',
+        fontSize: 14,
+    },
+    detailText: {
+        color: "#fff"
+    },
+    detailContainer: {
+        padding: 16
+    }
 });
 
 export default TicketPurchaseModal;

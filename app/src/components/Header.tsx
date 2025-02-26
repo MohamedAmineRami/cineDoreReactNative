@@ -1,6 +1,9 @@
 import React from 'react';
 import {View, Image, StyleSheet, TouchableOpacity, Text} from 'react-native';
 import { NavigationProp, useNavigation } from "@react-navigation/native";
+import FilmotecaEspanola from "../assets/svgr/FilmotecaEspanola";
+import MinesterioCultura from "../assets/svgr/MinesterioCultura";
+import LogoCineDore from "../assets/svgr/LogoCineDore";
 
 const Header = () => {
     const navigation = useNavigation<NavigationProp<any>>();
@@ -9,26 +12,15 @@ const Header = () => {
         <View style={styles.container}>
             <View style={styles.header}>
                 <View style={styles.logoContainer}>
-                    <Image
-                        source={require('../assets/images/logoCinedore.png')}
-                        style={styles.logo}
-                        resizeMode="contain"
-                    />
-                    <Text style={styles.cineTitulo}>
-                        CINE <Text style={{ fontWeight: 'bold' }}>DORÉ</Text>
-                    </Text>
+                    <LogoCineDore/>
                 </View>
                 <View style={styles.rightLogosContainer}>
-                    <Image
-                        source={require('../assets/images/ministerio.png')}
-                        style={styles.rightLogo}
-                        resizeMode="contain"
-                    />
-                    <Image
-                        source={require('../assets/images/filmotecaLogoText.png')}
-                        style={styles.rightLogo}
-                        resizeMode="contain"
-                    />
+                   <View
+                    style={styles.mc}
+                   ><MinesterioCultura /></View>
+                    <View
+                        style={styles.fe}
+                    ><FilmotecaEspanola/></View>
                 </View>
             </View>
         </View>
@@ -48,9 +40,8 @@ const styles = StyleSheet.create({
         paddingHorizontal: 16,
     },
     logoContainer: {
-        flex: 1,
-        flexDirection: 'row',
-        gap:0
+        height: 30,
+        width: 157.09,
     },
     logo: {
         height: 17,
@@ -69,6 +60,14 @@ const styles = StyleSheet.create({
     rightLogo: {
         height: 30,
         width: 80,
+    },
+    fe:  {
+        height: 13,
+        width: 63,
+    },
+    mc:  {
+        height: 13,
+        width: 53,
     },
 });
 

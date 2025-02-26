@@ -26,7 +26,6 @@ const styles = StyleSheet.create({
         flexDirection: 'row',
         alignItems: 'center',
         justifyContent: 'flex-end',
-        marginTop: 10,
     },
     quantityButton: {
         color: '#fff',

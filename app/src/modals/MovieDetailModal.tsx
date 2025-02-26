@@ -122,32 +122,45 @@ const MovieDetailModal: React.FC<MovieDetailModalProps> = ({ visible, movieId, o
                             <Text style={styles.ageBadge}>{movie.clasificacion}</Text>
                             <Text style={styles.movieTitle}>{movie.nombre}</Text>
                         </View>
-                        <Text style={styles.movieDetails}>
-                            {movie.categoria} | {movie.anio} | {movie.duracion}m | {movie.lenguaje}
-                        </Text>
+                        <View style={styles.movieDetails}>
+                            <Text
+                            style={styles.detailText}
+                            >{movie.categoria} | {movie.anio} </Text>
+                            <Text
+                                style={styles.detailText}
+
+                            >{movie.duracion}m | {movie.lenguaje}</Text>
+                        </View>
 
                         {activeTab === 'Horarios' ? (
                             <View style={styles.scheduleContainer}>
-                                {Object.entries(schedules).map(([date, timeSlots]) => (
-                                    <View key={date} style={styles.timesContainer}>
-                                        {timeSlots.map((slot, index) => (
-                                            <TouchableOpacity
-                                                key={`${date}-${index}`} // Ensuring unique key
-                                                style={styles.timeSlot}
-                                                onPress={() => {
-                                                    setSelectedDate(date);
-                                                    setSelectedTime(slot.time);
-                                                    setSelectedSala(slot.sala);
-                                                    setShowTicketPurchase(true);
-                                                }}
-                                            >
-                                                <Text style={styles.scheduleDate}>{date}</Text>
-                                                <Text style={styles.scheduleTime}>{slot.time}</Text>
-                                                <Text style={styles.scheduleSala}>{slot.sala}</Text>
-                                            </TouchableOpacity>
-                                        ))}
-                                    </View>
-                                ))}
+                                {Object.entries(schedules).map(([date, timeSlots]) => {
+                                    const [day, month, year] = date.split("/").map(Number);
+                                    const dateToFormat = new Date(year, month - 1, day); // Month is 0-based
+
+                                    const options = { weekday: "long", day: "numeric", month: "long" };
+                                    const formattedDate = dateToFormat.toLocaleDateString("es-ES", options);
+                                    const capitalizedDate = formattedDate.charAt(0).toUpperCase() + formattedDate.slice(1);
+                                    return (
+                                        <View key={date} style={styles.timesContainer}>
+                                            {timeSlots.map((slot, index) => (
+                                                <TouchableOpacity
+                                                    key={`${date}-${index}`} // Ensuring unique key
+                                                    style={styles.timeSlot}
+                                                    onPress={() => {
+                                                        setSelectedDate(date);
+                                                        setSelectedTime(slot.time);
+                                                        setSelectedSala(slot.sala);
+                                                        setShowTicketPurchase(true);
+                                                    }}
+                                                >
+                                                    <Text style={styles.scheduleDate}>{capitalizedDate}</Text>
+                                                    <Text style={styles.scheduleTime}>{slot.time}</Text>
+                                                </TouchableOpacity>
+                                            ))}
+                                        </View>
+                                    )
+                                })}
                             </View>
                         ) : (
                             <View style={styles.synopsisContainer}>
@@ -226,8 +239,13 @@ const styles = StyleSheet.create({
         fontWeight: 'bold',
     },
     movieDetails: {
+        flexDirection: 'row',
+        justifyContent: 'space-between',
         color: '#b0b0b0',
         fontSize: 14,
+    },
+    detailText: {
+        color: "#fff"
     },
     formatContainer: {
         marginTop: 12,
@@ -277,39 +295,29 @@ const styles = StyleSheet.create({
     scheduleDate: {
         fontSize: 18,
         fontWeight: 'bold',
-        color: '#000',
-        borderColor:'#000',
-        borderWidth: 0.5,
+        color: '#fff',
         paddingHorizontal: 2,
     },
     timesContainer: {
         flexDirection: 'column',
     },
     timeSlot: {
-        backgroundColor: '#f0f0f0',
-        padding: 10,
         borderRadius: 8,
         marginRight: 10,
         marginBottom: 10,
         minWidth: 80,
-        alignItems: 'center',
-        justifyContent: 'center',
-        flexDirection: 'row',
+        flexDirection: 'column',
     },
     scheduleTime: {
-        fontSize: 18,
-        fontWeight: 'bold',
-        color: '#333',
-        borderColor:'#000',
-        borderWidth: 0.5,
+        fontSize: 16,
+        color: '#fff',
         paddingHorizontal: 2,
     },
     scheduleSala: {
         fontSize: 18,
         fontWeight: 'bold',
-        color: '#333',
-        borderColor:'#000',
-        borderWidth: 0.5,
+        color: '#fff',
+
         paddingHorizontal: 2,
     },
     titleContainer: {
