@@ -34,7 +34,7 @@ const Home = () => {
 
     return (
         <LinearGradient
-            colors={['#00060F', '#041B35']}
+            colors={['#00060F', '#000B17']}
             style={styles.gradient}
         >
             <SafeAreaView style={styles.container}>
