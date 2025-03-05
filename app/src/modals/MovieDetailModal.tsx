@@ -3,17 +3,15 @@ import {View, Text, Modal, TouchableOpacity, Image, StyleSheet, ActivityIndicato
 import TabNavigation from '../components/TabNavigation';
 import TicketPurchaseModal from '../modals/TicketPurchaseModal';
 import { fetchMovieById } from '../services/movies';
-import { Movie } from '../types';
-
-interface MovieDetailModalProps {
-    visible: boolean;
-    movieId: number | null;
-    onClose: () => void;
-}
+import {Movie, MovieDetailModalProps, RootStackParamList} from '../types';
+import {useNavigation} from "@react-navigation/native";
+import {NativeStackNavigationProp} from "@react-navigation/native-stack";
+import {Clock} from "lucide-react-native";
 
 const MovieDetailModal: React.FC<MovieDetailModalProps> = ({ visible, movieId, onClose }) => {
+    const navigation = useNavigation<NativeStackNavigationProp<RootStackParamList>>();
     const [activeTab, setActiveTab] = useState('Horarios');
-    const [showTicketPurchase, setShowTicketPurchase] = useState(false);
+    const [purchaseModalVisible, setPurchaseModalVisible] = useState(false);
     const [selectedDate, setSelectedDate] = useState('');
     const [selectedTime, setSelectedTime] = useState('');
     const [selectedSala, setSelectedSala] = useState('');
@@ -41,6 +39,10 @@ const MovieDetailModal: React.FC<MovieDetailModalProps> = ({ visible, movieId, o
             setMovie(null);
         }
     }, [movieId]);
+
+    const handlePurchaseComplete = (ticketData: any) => {
+        console.log('Purchase completed:', ticketData);
+    };
 
     if (!visible) return null;
 
@@ -83,17 +85,23 @@ const MovieDetailModal: React.FC<MovieDetailModalProps> = ({ visible, movieId, o
             </Modal>
         );
     }
+    const options: Intl.DateTimeFormatOptions = {
+        weekday: 'long',
+        day: 'numeric',
+        month: 'long'
+    };
+
 
     const schedules = movie.funciones.reduce((acc, funcion) => {
         const dateTime = new Date(funcion.fechaHora);
-        const date = dateTime.toLocaleDateString('es-ES');
+        const date = dateTime.toLocaleDateString('es-ES', options);
         const time = dateTime.toLocaleTimeString('es-ES', { hour: '2-digit', minute: '2-digit' });
 
         if (!acc[date]) acc[date] = [];
 
-        acc[date].push({ time, sala: funcion.sala });
+        acc[date].push({ time, sala: funcion.sala, funcionId: funcion.id });
         return acc;
-    }, {} as { [key: string]: { time: string, sala: string }[] });
+    }, {} as { [key: string]: { time: string, sala: string, funcionId: number }[] });
 
     return (
         <Modal
@@ -122,30 +130,40 @@ const MovieDetailModal: React.FC<MovieDetailModalProps> = ({ visible, movieId, o
                             <Text style={styles.ageBadge}>{movie.clasificacion}</Text>
                             <Text style={styles.movieTitle}>{movie.nombre}</Text>
                         </View>
-                        <Text style={styles.movieDetails}>
-                            {movie.categoria} | {movie.anio} | {movie.duracion}m | {movie.lenguaje}
-                        </Text>
+                        <View style={styles.movieDetails}>
+                            <Text
+                                style={styles.detailText}
+                            >{movie.categoria} | {movie.anio} </Text>
+                            <Clock style={styles.clock} size={12} color="#fff" />
+                            <Text
+                                style={styles.detailText}
+                            >
+
+                                {movie.duracion}m | {movie.lenguaje} </Text>
+                        </View>
 
                         {activeTab === 'Horarios' ? (
                             <View style={styles.scheduleContainer}>
                                 {Object.entries(schedules).map(([date, timeSlots]) => (
                                     <View key={date} style={styles.timesContainer}>
-                                        {timeSlots.map((slot, index) => (
-                                            <TouchableOpacity
-                                                key={`${date}-${index}`} // Ensuring unique key
-                                                style={styles.timeSlot}
-                                                onPress={() => {
-                                                    setSelectedDate(date);
-                                                    setSelectedTime(slot.time);
-                                                    setSelectedSala(slot.sala);
-                                                    setShowTicketPurchase(true);
-                                                }}
-                                            >
-                                                <Text style={styles.scheduleDate}>{date}</Text>
-                                                <Text style={styles.scheduleTime}>{slot.time}</Text>
-                                                <Text style={styles.scheduleSala}>{slot.sala}</Text>
-                                            </TouchableOpacity>
-                                        ))}
+
+                                        <View>
+                                            {timeSlots.map((slot, index) => (
+                                                <TouchableOpacity
+                                                    key={`${date}-${index}`}
+                                                    style={styles.timeSlot}
+                                                    onPress={() => {
+                                                        setSelectedDate(date);
+                                                        setSelectedTime(slot.time);
+                                                        setSelectedSala(slot.sala);
+                                                        setPurchaseModalVisible(true);
+                                                    }}
+                                                >
+                                                    <Text style={styles.dateHeader}>{date}</Text>
+                                                    <Text style={styles.scheduleTime}>{slot.time}</Text>
+                                                </TouchableOpacity>
+                                            ))}
+                                        </View>
                                     </View>
                                 ))}
                             </View>
@@ -168,12 +186,14 @@ const MovieDetailModal: React.FC<MovieDetailModalProps> = ({ visible, movieId, o
             </View>
 
             <TicketPurchaseModal
-                visible={showTicketPurchase}
-                onClose={() => setShowTicketPurchase(false)}
+                visible={purchaseModalVisible}
+                onClose={() => setPurchaseModalVisible(false)}
                 movie={movie}
                 selectedDate={selectedDate}
                 selectedTime={selectedTime}
                 selectedSala={selectedSala}
+                onPurchaseComplete={handlePurchaseComplete}
+                navigation={navigation}
             />
         </Modal>
     );
@@ -226,8 +246,23 @@ const styles = StyleSheet.create({
         fontWeight: 'bold',
     },
     movieDetails: {
+        flexDirection: 'row',
+        justifyContent: 'space-between',
         color: '#b0b0b0',
         fontSize: 14,
+    },
+    clock:{
+        position: 'absolute',
+        left: 290,
+        marginTop: 4
+    },
+    detailText: {
+        color: "#fff",
+    },
+    dateHeader: {
+        color: '#fff',
+        fontSize: 20,
+        fontWeight: 'bold',
     },
     formatContainer: {
         marginTop: 12,
@@ -260,6 +295,7 @@ const styles = StyleSheet.create({
         fontSize: 14,
         lineHeight: 20,
     },
+
     loadingText: {
         fontSize: 16,
         marginTop: 10,
@@ -281,26 +317,27 @@ const styles = StyleSheet.create({
         color: '#000',
     },
     timesContainer: {
-        flexDirection: 'row',
+        flexDirection: 'column',
     },
     timeSlot: {
-        backgroundColor: '#f0f0f0',
-        padding: 10,
+        backgroundColor: '#4CC9F0FF',
         borderRadius: 8,
         marginRight: 10,
         marginBottom: 10,
         minWidth: 80,
         alignItems: 'center',
+        justifyContent: 'space-between',
+        flexDirection: 'row',
+        padding: 10
     },
     scheduleTime: {
-        fontSize: 16,
+        fontSize: 20,
         fontWeight: '600',
-        color: '#333',
+        color: '#fff',
     },
     scheduleSala: {
-        fontSize: 12,
-        color: '#666',
-        marginTop: 4,
+        fontSize: 20,
+        color: '#fff',
     },
     titleContainer: {
         marginBottom: 24,

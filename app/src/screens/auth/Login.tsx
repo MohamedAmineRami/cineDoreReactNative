@@ -22,8 +22,8 @@ const Login: React.FC<LoginProps> = ({ setUser }) => {
         setLoading(true);
         try {
             const response = await login(email, password);
-            await SecureStore.setItemAsync('token', response.token); // Store JWT token
-            setUser(true); // Update user state
+            await SecureStore.setItemAsync('token', response.token);
+            setUser(true);
         } catch (error) {
             Alert.alert('Error', 'Invalid email or password');
         } finally {

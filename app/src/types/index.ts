@@ -1,3 +1,5 @@
+import {NativeStackNavigationProp} from "@react-navigation/native-stack";
+
 export interface Movie {
     id: number;
     nombre: string;
@@ -19,36 +21,29 @@ export interface Funcion {
     sala: string;
 }
 
-export interface CompraDTO {
-    usuarioId: number;
-    funcionId: number;
-    totalPago: number;
-    tickets: TicketEntradaDTO[];
+export interface MovieDetailModalProps {
+    visible: boolean;
+    movieId: number | null;
+    onClose: () => void;
 }
 
-export interface TicketEntradaDTO {
-    codigoQr: string;
-    estadoId: number;
-}
-
-export interface TicketDisplayDTO {
-    funcionId: number;
-    totalPago: number;
-    codigoQr: string;
-    fechaFuncion: string;
-    tituloPelicula: string;
-    imagenPelicula: string;
-    clasificacion: string;
-    lenguaje: string;
-    duracion: number;
-    cantidadTickets: number;
-}
+export type RootStackParamList = {
+    Welcome: undefined;
+    Login: undefined;
+    Home: undefined;
+    Register: undefined;
+    Cine: undefined;
+    Profile: undefined;
+    TicketScreen: { ticketData: any };
+};
 
 export interface TicketPurchaseModalProps {
     visible: boolean;
     onClose: () => void;
-    movie: Movie | null;
+    movie: any;
     selectedDate: string;
     selectedTime: string;
     selectedSala: string;
+    onPurchaseComplete: (ticketData: any) => void;
+    navigation: NativeStackNavigationProp<RootStackParamList>;
 }

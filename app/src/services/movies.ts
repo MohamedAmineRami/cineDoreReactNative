@@ -3,7 +3,6 @@ import { Movie } from "../types";
 
 export const fetchMovies = async () => {
     try {
-        // Update endpoint to use peliculasDTO instead of peliculas
         const response = await api.get('/peliculasDTO');
         return response.data;
     } catch (error) {
@@ -14,7 +13,6 @@ export const fetchMovies = async () => {
 
 export const fetchMovieById = async (id: number): Promise<Movie> => {
     try {
-        // Update endpoint to use peliculasDTO instead of peliculas
         const response = await api.get(`/peliculasDTO/${id}`);
         return response.data;
     } catch (error) {

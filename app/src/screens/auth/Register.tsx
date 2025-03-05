@@ -1,4 +1,3 @@
-// src/screens/Register.tsx
 import React, { useState } from 'react';
 import { Alert, KeyboardAvoidingView, ScrollView, StyleSheet, Text, TouchableOpacity } from 'react-native';
 import {NavigationProp, useNavigation} from '@react-navigation/native';

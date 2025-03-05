@@ -11,6 +11,8 @@ import CineScreen from "./app/src/screens/main/Cine";
 import HomeScreen from "./app/src/screens/main/Home";
 import Profile from "./app/src/screens/main/Profile";
 import { AuthProvider } from './app/src/context/AuthContext';
+import TicketScreen from "./app/src/screens/ticket/Ticket";
+import {TransitionPresets} from "@react-navigation/stack";
 
 type RootStackParamList = {
     Welcome: undefined;
@@ -19,6 +21,7 @@ type RootStackParamList = {
     Register: undefined;
     Cine: undefined;
     Profile: undefined;
+    TicketScreen: undefined;
 };
 
 const Stack = createNativeStackNavigator<RootStackParamList>();
@@ -60,49 +63,58 @@ export default function App() {
 
     return (
         <AuthProvider>
-        <NavigationContainer>
-            <Stack.Navigator id={undefined}>
-                {user ? (
-                    <>
-                        <Stack.Screen
-                            name="Home"
-                            component={HomeScreen}
-                            options={{ headerShown: false }}
-                        />
-                        <Stack.Screen
-                            name="Cine"
-                            component={CineScreen}
-                            options={{ headerShown: false }}
-                        />
-                        <Stack.Screen
-                            name="Profile"
-                            options={{ headerShown: false }}
-                        >
-                            {(props) => <Profile {...props} setUser={setUser} />}
-                        </Stack.Screen>
-                    </>
-                ) : (
-                    <>
-                        <Stack.Screen
-                            name="Welcome"
-                            component={Welcome}
-                            options={{ headerShown: false }}
-                        />
-                        <Stack.Screen
-                            name="Login"
-                            options={{ headerShown: false }}
-                        >
-                            {(props) => <Login {...props} setUser={setUser} />}
-                        </Stack.Screen>
-                        <Stack.Screen
-                            name="Register"
-                            component={Register}
-                            options={{ headerShown: false }}
-                        />
-                    </>
-                )}
-            </Stack.Navigator>
-        </NavigationContainer>
+            <NavigationContainer>
+                <Stack.Navigator id={undefined}>
+                    {user ? (
+                        <>
+                            <Stack.Screen
+                                name="Home"
+                                component={HomeScreen}
+                                options={{ headerShown: false }}
+                            />
+                            <Stack.Screen
+                                name="Cine"
+                                component={CineScreen}
+                                options={{ headerShown: false }}
+                            />
+                            <Stack.Screen
+                                name="Profile"
+                                options={{ headerShown: false }}
+                            >
+                                {(props) => <Profile {...props} setUser={setUser} />}
+                            </Stack.Screen>
+                            <Stack.Screen
+                                name="TicketScreen"
+                                component={TicketScreen}
+                                options={{
+                                    headerShown: false,
+                                    presentation: 'modal',
+                                    animation: 'slide_from_bottom'
+                                }}
+                            />
+                        </>
+                    ) : (
+                        <>
+                            <Stack.Screen
+                                name="Welcome"
+                                component={Welcome}
+                                options={{ headerShown: false }}
+                            />
+                            <Stack.Screen
+                                name="Login"
+                                options={{ headerShown: false }}
+                            >
+                                {(props) => <Login {...props} setUser={setUser} />}
+                            </Stack.Screen>
+                            <Stack.Screen
+                                name="Register"
+                                component={Register}
+                                options={{ headerShown: false }}
+                            />
+                        </>
+                    )}
+                </Stack.Navigator>
+            </NavigationContainer>
         </AuthProvider>
     );
 }

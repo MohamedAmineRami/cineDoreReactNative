@@ -9,7 +9,6 @@ import MovieGrid from '../../components/movie/MovieGrid';
 import MovieDetailModal from '../../modals/MovieDetailModal';
 import { fetchMovies } from '../../services/movies';
 import { Movie } from '../../types';
-import CountryFlag from "react-native-country-flag";
 
 const Home = () => {
     const [selectedMovieId, setSelectedMovieId] = useState<number | null>(null);

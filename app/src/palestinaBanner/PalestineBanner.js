@@ -12,7 +12,7 @@ const PalestineBanner = ({ statement, externalLink }) => {
         <TouchableOpacity onPress={handlePress}>
             <View style={styles.banner}>
                 <View style={styles.flagContainer}>
-                    {/* Palestine Flag */}
+
                     <View style={styles.flagStripeBlack} />
                     <View style={styles.flagStripeWhite} />
                     <View style={styles.flagStripeGreen} />
