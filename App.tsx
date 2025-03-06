@@ -12,7 +12,6 @@ import HomeScreen from "./app/src/screens/main/Home";
 import Profile from "./app/src/screens/main/Profile";
 import { AuthProvider } from './app/src/context/AuthContext';
 import TicketScreen from "./app/src/screens/ticket/Ticket";
-import {TransitionPresets} from "@react-navigation/stack";
 
 type RootStackParamList = {
     Welcome: undefined;
